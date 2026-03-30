@@ -155,6 +155,8 @@
     .badge-S  { background: rgba(91,61,184,0.2);  color: #C3AFF5; border: 1px solid rgba(91,61,184,0.4); }
     .badge-RM { background: rgba(184,50,50,0.2);  color: #F5A0A0; border: 1px solid rgba(184,50,50,0.4); }
     .badge-DM { background: rgba(14,122,78,0.2);  color: #7AF5C0; border: 1px solid rgba(14,122,78,0.4); }
+    .badge-SE { background: rgba(14,122,78,0.2);  color: #7AF5C0; border: 1px solid rgba(14,122,78,0.4); }
+    .badge-SS { background: rgba(184,50,50,0.2);  color: #F5A0A0; border: 1px solid rgba(184,50,50,0.4); }
 
     /* LINHA DE EQUIPAMENTO */
     .eq-item {
@@ -582,22 +584,31 @@ const EQS = [
   "CARRINHO C/ SUPORTE","ESMERILHADEIRA ELÉTRICA MP5","ESMERILHADEIRA ELÉTRICA MP12",
   "FURADEIRA DORMENTE PT8","FURADEIRA DORMENTE PORTÁTIL","FURADEIRA TRILHO VÍDEA",
   "GERADOR DE ENERGIA BRANCO","MACACO MECÂNICO","MACACO HIDRÁULICO",
-  "PÉ DE PATO (SOCADOR MANUAL)","POLICORTE C/ SUPORTE (GEISMAR)","POLICORTE C/ SUPORTE (HUSQVARNA)",
+  "PÉ DE PATO (SOCADOR MANUAL)","POLICORTE (GEISMAR)","POLICORTE (HUSQVARNA)",
   "REBARBADORA HIDRÁULICA (GESIMAR)","REBARBADORA HIDRÁULICA (NACIONAIS)",
   "TIREFONADORA PORTÁTIL","CONJUNTO AUTOPORTANTE","GERADOR JACKSON"
 ];
 
 const LEGS = [
   {v:"",l:"— selecione —"},
+  {v:"RM",l:"RM — Retirada p/ manutenção"},
+  {v:"DM",l:"DM — Devolução manutenção"},
   {v:"L",l:"L — Nova locação"},
   {v:"D",l:"D — Devolução de locação"},
-  {v:"S",l:"S — Substituição"},
-  {v:"RM",l:"RM — Retirada p/ manutenção"},
-  {v:"DM",l:"DM — Devolução manutenção"}
+  {v:"SE",l:"SE — Substituição entrada"},
+  {v:"SS",l:"SS — Substituição saída"}
 ];
 
-const LEG_MAP = {L:"Nova locação",D:"Devolução de locação",S:"Substituição",RM:"Retirada p/ manutenção",DM:"Devolução manutenção"};
-const LEG_CLS = {L:"badge-L",D:"badge-D",S:"badge-S",RM:"badge-RM",DM:"badge-DM"};
+const LEG_MAP = {RM:"Retirada p/ manutenção",DM:"Devolução manutenção",L:"Nova locação",D:"Devolução de locação",SE:"Substituição entrada",SS:"Substituição saída"};
+const LEG_CLS = {RM:"badge-RM",DM:"badge-DM",L:"badge-L",D:"badge-D",SE:"badge-SE",SS:"badge-SS"};
+const LEG_DIR = {
+  RM: "← Entrada | Retirada manutenção",
+  DM: "→ Saída | Devolução manutenção",
+  L:  "→ Saída | Nova locação",
+  D:  "← Entrada | Devolução de locação",
+  SE: "← Entrada | Substituição entrada",
+  SS: "→ Saída | Substituição saída"
+};
 
 let rowCount = 0;
 let fotos = {};
@@ -661,16 +672,20 @@ function addRow() {
         <select id="leg-${id}" onchange="onLegChange(${id})">${legOpts('')}</select>
       </div>
       <div class="full">
+        <label>Observação</label>
+        <input type="text" id="obs-${id}" placeholder="Observação (opcional)" autocomplete="off">
+      </div>
+      <div class="full">
         <label>Fotos do equipamento</label>
         <div class="foto-row">
           <label class="foto-btn saida" id="fb-saida-${id}">
             <span id="fi-saida-${id}">${camSVG()}</span>
-            <span id="ft-saida-${id}">Foto saída</span>
+            <span id="ft-saida-${id}">Saída de equipamento</span>
             <input type="file" accept="image/*" capture="environment" onchange="fotoSelecionada(${id},'saida',this)">
           </label>
           <label class="foto-btn retorno" id="fb-retorno-${id}">
             <span id="fi-retorno-${id}">${camSVG()}</span>
-            <span id="ft-retorno-${id}">Foto retorno</span>
+            <span id="ft-retorno-${id}">Entrada de equipamento</span>
             <input type="file" accept="image/*" capture="environment" onchange="fotoSelecionada(${id},'retorno',this)">
           </label>
         </div>
@@ -715,13 +730,13 @@ function fotoSelecionada(id, tipo, input) {
     const txt = document.getElementById('ft-' + tipo + '-' + id);
     btn.classList.add('ok');
     icon.innerHTML = checkSVG();
-    txt.textContent = tipo === 'saida' ? 'Ver saída' : 'Ver retorno';
+    txt.textContent = tipo === 'saida' ? 'Ver saída' : 'Ver entrada';
     // Troca onclick
     btn.onclick = function(e) {
       e.preventDefault();
       verFoto(id, tipo);
     };
-    toast('Foto ' + (tipo === 'saida' ? 'de saída' : 'de retorno') + ' salva ✓');
+    toast('Foto de ' + (tipo === 'saida' ? 'saída' : 'entrada') + ' salva ✓');
   };
   reader.readAsDataURL(file);
 }
@@ -730,7 +745,7 @@ function verFoto(id, tipo) {
   const f = fotos[id] && fotos[id][tipo];
   if (!f) return;
   fotoAtual = {id, tipo};
-  document.getElementById('foto-modal-titulo').textContent = tipo === 'saida' ? '📸 Foto de saída' : '📸 Foto de retorno';
+  document.getElementById('foto-modal-titulo').textContent = tipo === 'saida' ? '📸 Foto de saída' : '📸 Foto de entrada';
   document.getElementById('foto-preview-img').src = f.dataUrl;
   const eq = document.getElementById('eq-' + id)?.value || '—';
   const pat = document.getElementById('pat-' + id)?.value || '—';
@@ -755,7 +770,7 @@ function removerFoto() {
   const txt = document.getElementById('ft-' + tipo + '-' + id);
   btn.classList.remove('ok');
   icon.innerHTML = camSVG();
-  txt.textContent = tipo === 'saida' ? 'Foto saída' : 'Foto retorno';
+  txt.textContent = tipo === 'saida' ? 'Saída de equipamento' : 'Entrada de equipamento';
   btn.onclick = null;
   const inp = btn.querySelector('input[type=file]');
   if (inp) inp.value = '';
@@ -766,7 +781,7 @@ function removerFoto() {
 function onLegChange(id) {
   const leg = document.getElementById('leg-' + id).value;
   const sp = document.getElementById('sp-' + id);
-  if (leg === 'S') {
+  if (leg === 'SE' || leg === 'SS') {
     sp.classList.add('show');
     const pat = document.getElementById('pat-' + id).value.trim();
     if (pat) document.getElementById('pat-entrou-' + id).value = pat;
@@ -844,7 +859,7 @@ function atualizar() {
     return;
   }
   bar.innerHTML = Object.entries(counts)
-    .map(([k,v]) => `<span class="badge ${LEG_CLS[k]||''}">${k} <strong>${v}x</strong></span>`)
+    .map(([k,v]) => `<span class="badge ${LEG_CLS[k]||''}">${LEG_DIR[k]||k} <strong>${v}x</strong></span>`)
     .join('') +
     `<span style="margin-left:auto;font-size:11px;color:var(--text2)">${total} moviment.</span>`;
 }
@@ -866,15 +881,16 @@ function gerarWhatsapp() {
     const eq = document.getElementById('eq-' + rid)?.value || '';
     const pat = document.getElementById('pat-' + rid)?.value.trim() || '';
     const leg = document.getElementById('leg-' + rid)?.value || '';
+    const obs = document.getElementById('obs-' + rid)?.value.trim() || '';
     if (!pat || !leg) return;
 
     const f = fotos[rid] || {};
-    const fStr = [f.saida ? '📷saída' : '', f.retorno ? '📷retorno' : ''].filter(Boolean).join(' ');
+    const fStr = [f.saida ? '📷saída' : '', f.retorno ? '📷entrada' : ''].filter(Boolean).join(' ');
     totalFotos += (f.saida ? 1 : 0) + (f.retorno ? 1 : 0);
 
-    let linha = `• ${eq || '—'}\n  Pat: ${pat} | ${LEG_MAP[leg] || leg}${fStr ? ' | ' + fStr : ''}`;
+    let linha = `• ${eq || '—'}\n  Pat: ${pat} | ${LEG_MAP[leg] || leg}${obs ? ' | Obs: ' + obs : ''}${fStr ? ' | ' + fStr : ''}`;
 
-    if (leg === 'S') {
+    if (leg === 'SE' || leg === 'SS') {
       const saiu = document.getElementById('pat-saiu-' + rid)?.value.trim() || '';
       const entrou = document.getElementById('pat-entrou-' + rid)?.value.trim() || '';
       if (saiu || entrou) linha += `\n  ↑ Saiu: ${saiu || '—'} → ↓ Entrou: ${entrou || '—'}`;
