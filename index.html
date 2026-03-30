@@ -188,6 +188,7 @@
   </div>
   <div class="hist-all-toggle">
     <button onclick="mostrarTodos()">Ver todos os registros</button>
+    <button onclick="exportarExcel()" style="margin-left:8px;background:none;border:1px solid #1D9E75;border-radius:var(--radius);color:#7AF5C0;font-size:12px;font-family:inherit;padding:8px 20px;cursor:pointer">📊 EXL</button>
   </div>
   <div class="hist-results" id="hist-results">
     <div class="hist-empty"><span>🔍</span>Digite o número do patrimônio<br>para ver o histórico completo.</div>
@@ -689,6 +690,46 @@ document.querySelectorAll('.modal-bg').forEach(m => {
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+function exportarExcel() {
+  const hist = getHistorico();
+  if (!hist.length) { toast('Nenhum registro para exportar ⚠'); return; }
+
+  const colunas = ['Folha','Data','Empresa','Contrato','Cidade','NF','Equipamento','Patrimônio','Legenda','Movimentação','Saiu da oficina','Entrou na oficina','Obs'];
+
+  const linhas = hist.map(r => ({
+    'Folha':            r.folha    || '—',
+    'Data':             r.data     || '—',
+    'Empresa':          r.empresa  || '—',
+    'Contrato':         r.contrato || '—',
+    'Cidade':           r.cidade   || '—',
+    'NF':               r.nf       || '',
+    'Equipamento':      r.eq       || '—',
+    'Patrimônio':       r.pat      || '—',
+    'Legenda':          r.leg      || '—',
+    'Movimentação':     LEG_MAP[r.leg] || r.leg || '—',
+    'Saiu da oficina':  r.saiu     || '',
+    'Entrou na oficina':r.entrou   || '',
+    'Obs':              r.obs      || ''
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(linhas, {header: colunas});
+
+  // Larguras das colunas
+  ws['!cols'] = [
+    {wch:8},{wch:12},{wch:20},{wch:18},{wch:18},{wch:10},
+    {wch:28},{wch:12},{wch:8},{wch:24},{wch:16},{wch:16},{wch:24}
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Histórico');
+
+  const hoje = new Date().toISOString().split('T')[0].split('-').reverse().join('-');
+  XLSX.writeFile(wb, `equipamentos_${hoje}.xlsx`);
+  toast(`Excel gerado! ${linhas.length} registros ✓`);
 }
 </script>
 </body>
