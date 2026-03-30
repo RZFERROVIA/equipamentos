@@ -724,6 +724,9 @@ function exportarExcel() {
     {wch:28},{wch:12},{wch:8},{wch:24},{wch:16},{wch:16},{wch:24}
   ];
 
+  // Filtros automáticos em todas as colunas
+  ws['!autofilter'] = {ref: `A1:M${linhas.length+1}`};
+
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Histórico');
 
