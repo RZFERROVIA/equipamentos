@@ -163,6 +163,7 @@
         <div class="field full"><label>Empresa</label><input type="text" id="empresa" placeholder="Nome da empresa"></div>
         <div class="field"><label>Contrato</label><input type="text" id="contrato" placeholder="Nº ou nome"></div>
         <div class="field"><label>Cidade</label><input type="text" id="cidade" placeholder="Cidade"></div>
+        <div class="field"><label>NF</label><input type="text" id="nf" placeholder="Número da NF (opcional)" autocomplete="off" inputmode="text"></div>
         <div class="field full"><label>Observação geral</label><input type="text" id="obs-geral" placeholder="Observação geral da folha (opcional)" autocomplete="off"></div>
       </div>
     </div>
@@ -430,6 +431,7 @@ function salvarRegistro() {
   const emp  = document.getElementById('empresa').value.trim()  || '—';
   const ctto = document.getElementById('contrato').value.trim() || '—';
   const cid  = document.getElementById('cidade').value.trim()   || '—';
+  const nfVal= document.getElementById('nf').value.trim()       || '';
   const obsG = document.getElementById('obs-geral').value.trim();
   const dtFmt= dt ? dt.split('-').reverse().join('/') : dt;
 
@@ -456,7 +458,7 @@ function salvarRegistro() {
 
   registros.forEach(r => {
     hist.push({pat:r.pat,eq:r.eq,leg:r.leg,obs:r.obs,obsGeral:obsG,
-      saiu:r.saiu,entrou:r.entrou,folha:nf,data:dtFmt,
+      saiu:r.saiu,entrou:r.entrou,folha:nf,data:dtFmt,nf:nfVal,
       empresa:emp,contrato:ctto,cidade:cid,ts:Date.now()});
   });
   salvarHistoricoLS(hist);
@@ -475,6 +477,7 @@ function gerarWhatsapp() {
   const emp  = document.getElementById('empresa').value  || '—';
   const ctto = document.getElementById('contrato').value || '—';
   const cid  = document.getElementById('cidade').value   || '—';
+  const nf_val = document.getElementById('nf').value.trim();
   const obsG = document.getElementById('obs-geral').value.trim();
   const dtFmt= dt ? dt.split('-').reverse().join('/') : '—';
 
@@ -510,6 +513,7 @@ function gerarWhatsapp() {
   msg += `Empresa: ${emp}\n`;
   msg += `Contrato: ${ctto}\n`;
   msg += `Cidade: ${cid}\n`;
+  if (nf_val) msg += `NF: ${nf_val}\n`;
 
   ordem.forEach(leg => {
     msg += `\n*${LEG_DIR[leg]}*\n`;
@@ -621,6 +625,7 @@ function cartaoHist(r, idx) {
         <span>🏢 ${r.empresa||'—'}</span>
         ${r.contrato?`<span>📄 ${r.contrato}</span>`:''}
         ${r.cidade?`<span>📍 ${r.cidade}</span>`:''}
+        ${r.nf?`<span>🧾 NF: ${r.nf}</span>`:''}
       </div>
       ${substHtml}${obsHtml}${obsGHtml}
       <div class="hist-item-actions">
