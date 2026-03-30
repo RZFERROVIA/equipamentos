@@ -31,279 +31,119 @@
       --radius-sm: 6px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--bg); color: var(--text);
-      min-height: 100vh; padding-bottom: 80px;
-    }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 80px; }
 
-    /* HEADER */
-    .app-header {
-      background: var(--bg2); border-bottom: 1px solid var(--border);
-      padding: 14px 16px 10px; position: sticky; top: 0; z-index: 50;
-    }
+    .app-header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 14px 16px 10px; position: sticky; top: 0; z-index: 50; }
     .app-header h1 { font-size: 16px; font-weight: 700; letter-spacing: 0.02em; }
     .app-header p  { font-size: 11px; color: var(--text2); margin-top: 2px; }
 
-    /* ABAS */
-    .tabs {
-      display: flex; background: var(--bg2);
-      border-bottom: 1px solid var(--border); position: sticky; top: 56px; z-index: 49;
-    }
-    .tab {
-      flex: 1; height: 40px; display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 600; color: var(--text3); cursor: pointer;
-      border-bottom: 2px solid transparent; gap: 5px; transition: all 0.15s;
-    }
+    .tabs { display: flex; background: var(--bg2); border-bottom: 1px solid var(--border); position: sticky; top: 56px; z-index: 49; }
+    .tab { flex: 1; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; gap: 5px; transition: all 0.15s; }
     .tab.active { color: var(--blue-light); border-bottom-color: var(--blue-light); }
 
-    /* PÁGINAS */
     .page { display: none; }
     .page.active { display: block; }
 
-    /* SEÇÃO */
     .section { padding: 14px 16px 0; }
-    .section-title {
-      font-size: 10px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.08em; color: var(--text3); margin-bottom: 8px;
-    }
-    .card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px;
-    }
+    .section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 8px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; }
     .header-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .header-grid .full { grid-column: 1 / -1; }
-    .field label {
-      display: block; font-size: 10px; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.06em; color: var(--text3); margin-bottom: 4px;
-    }
-    .field input, .field select {
-      width: 100%; height: 38px; padding: 0 10px;
-      background: var(--bg3); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); color: var(--text);
-      font-size: 13px; font-family: inherit; -webkit-appearance: none; appearance: none;
-    }
+    .field label { display: block; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 4px; }
+    .field input, .field select { width: 100%; height: 38px; padding: 0 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 13px; font-family: inherit; -webkit-appearance: none; appearance: none; }
     .field input:focus, .field select:focus { outline: none; border-color: var(--blue-light); }
     .field input::placeholder { color: var(--text3); }
 
-    /* RESUMO */
-    .summary {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 8px 12px;
-      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
-      min-height: 36px; margin-bottom: 10px;
-    }
+    .summary { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; min-height: 36px; margin-bottom: 10px; }
     .summary-empty { font-size: 12px; color: var(--text3); }
 
-    /* BADGES */
-    .badge {
-      display: inline-flex; align-items: center; padding: 3px 9px;
-      border-radius: 20px; font-size: 11px; font-weight: 600;
-    }
+    .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
     .badge-RM { background: rgba(14,122,78,0.2);  color: #7AF5C0; border: 1px solid rgba(14,122,78,0.4); }
     .badge-DM { background: rgba(184,50,50,0.2);  color: #F5A0A0; border: 1px solid rgba(184,50,50,0.4); }
     .badge-L  { background: rgba(184,50,50,0.2);  color: #F5A0A0; border: 1px solid rgba(184,50,50,0.4); }
     .badge-D  { background: rgba(14,122,78,0.2);  color: #7AF5C0; border: 1px solid rgba(14,122,78,0.4); }
-    .badge-SE { background: rgba(14,122,78,0.2);  color: #7AF5C0; border: 1px solid rgba(14,122,78,0.4); }
-    .badge-SS { background: rgba(184,50,50,0.2);  color: #F5A0A0; border: 1px solid rgba(184,50,50,0.4); }
+    .badge-S  { background: rgba(91,61,184,0.2);  color: #C3AFF5; border: 1px solid rgba(91,61,184,0.4); }
 
-    /* ITEM DE EQUIPAMENTO */
-    .eq-item {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); margin-bottom: 8px; overflow: hidden;
-    }
+    .eq-item { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; overflow: hidden; }
     .eq-item-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; }
     .eq-num { font-size: 11px; color: var(--text3); font-weight: 700; min-width: 18px; }
-    .eq-item select {
-      flex: 1; height: 34px; padding: 0 8px;
-      background: var(--bg3); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); color: var(--text);
-      font-size: 12px; font-family: inherit; -webkit-appearance: none; appearance: none;
-    }
+    .eq-item select { flex: 1; height: 34px; padding: 0 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 12px; font-family: inherit; -webkit-appearance: none; appearance: none; }
     .eq-item select:focus { outline: none; border-color: var(--blue-light); }
-    .del-btn {
-      width: 32px; height: 32px; background: rgba(184,50,50,0.12);
-      border: 1px solid rgba(184,50,50,0.25); border-radius: var(--radius-sm);
-      color: var(--red-light); cursor: pointer;
-      display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;
-    }
+    .del-btn { width: 32px; height: 32px; background: rgba(184,50,50,0.12); border: 1px solid rgba(184,50,50,0.25); border-radius: var(--radius-sm); color: var(--red-light); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+
     .eq-item-body { padding: 0 12px 10px; display: flex; flex-direction: column; gap: 8px; }
-    .eq-item-body input, .eq-item-body select {
-      width: 100%; height: 34px; padding: 0 10px;
-      background: var(--bg3); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); color: var(--text);
-      font-size: 12px; font-family: inherit; -webkit-appearance: none; appearance: none;
-    }
+    .eq-item-body input, .eq-item-body select { width: 100%; height: 34px; padding: 0 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 12px; font-family: inherit; -webkit-appearance: none; appearance: none; }
     .eq-item-body input:focus, .eq-item-body select:focus { outline: none; border-color: var(--blue-light); }
     .eq-item-body input::placeholder { color: var(--text3); }
-    .eq-item-body label {
-      font-size: 10px; color: var(--text3); font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px;
-    }
+    .eq-item-body label { font-size: 10px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px; }
 
-    /* PAINEL SUBSTITUIÇÃO */
     .subst-panel { display: none; padding: 0 12px 10px; }
     .subst-panel.show { display: block; }
-    .subst-inner {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 10px;
-    }
+    .subst-inner { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; }
     .subst-inner p { font-size: 11px; color: var(--text2); margin-bottom: 8px; }
     .subst-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .subst-card label {
-      font-size: 10px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.05em; display: block; margin-bottom: 4px;
-    }
+    .subst-card label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px; }
     .subst-card.saiu label   { color: #F5A0A0; }
     .subst-card.entrou label { color: #7AF5C0; }
-    .subst-card input {
-      width: 100%; height: 34px; padding: 0 8px;
-      background: var(--bg3); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); color: var(--text); font-size: 12px; font-family: inherit;
-    }
+    .subst-card input { width: 100%; height: 34px; padding: 0 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 12px; font-family: inherit; }
     .subst-card input:focus { outline: none; border-color: var(--blue-light); }
     .subst-card input::placeholder { color: var(--text3); }
-    .subst-ref { font-size: 10px; color: var(--text3); margin-top: 3px; min-height: 14px; }
-    .subst-ref.ok { color: #7AF5C0; }
-    .rm-alert {
-      font-size: 11px; background: rgba(184,50,50,0.15); color: #F5A0A0;
-      border: 1px solid rgba(184,50,50,0.3); border-radius: var(--radius-sm);
-      padding: 5px 8px; margin-top: 6px; display: none;
-    }
-    .rm-alert.show { display: block; }
+    .subst-ref { font-size: 10px; color: var(--text3); margin-top: 3px; min-height: 14px; line-height: 1.4; }
+    .subst-ref.ok   { color: #7AF5C0; }
+    .subst-ref.warn { color: #F5A0A0; }
 
-    /* BOTÃO ADICIONAR */
-    .btn-add {
-      width: 100%; height: 44px;
-      background: rgba(24,169,106,0.12); border: 1px dashed rgba(24,169,106,0.4);
-      border-radius: var(--radius); color: #7AF5C0;
-      font-size: 14px; font-weight: 600; font-family: inherit;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      gap: 6px; margin-bottom: 10px;
-    }
+    .btn-add { width: 100%; height: 44px; background: rgba(24,169,106,0.12); border: 1px dashed rgba(24,169,106,0.4); border-radius: var(--radius); color: #7AF5C0; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 10px; }
     .btn-add:active { background: rgba(24,169,106,0.2); }
     .count-badge { font-size: 11px; color: var(--text3); text-align: center; padding: 4px 0 2px; }
 
-    /* FOOTER */
-    .footer-actions {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--bg2); border-top: 1px solid var(--border);
-      padding: 10px 16px; display: flex; gap: 8px; z-index: 50;
-    }
-    .btn {
-      height: 44px; border-radius: var(--radius);
-      font-size: 13px; font-weight: 700; font-family: inherit;
-      cursor: pointer; border: none; transition: opacity 0.15s;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-    }
+    .footer-actions { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg2); border-top: 1px solid var(--border); padding: 10px 16px; display: flex; gap: 8px; z-index: 50; }
+    .btn { height: 44px; border-radius: var(--radius); font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; border: none; transition: opacity 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .btn:active { opacity: 0.75; }
-    .btn-salvar  { flex: 1; background: var(--blue); color: #fff; }
-    .btn-wa      { flex: 1.5; background: #1aaa5e; color: #fff; font-size: 14px; }
-    .btn-limpar  { width: 44px; background: var(--bg3); color: var(--text2); border: 1px solid var(--border); font-size: 18px; }
+    .btn-salvar { flex: 1; background: var(--blue); color: #fff; }
+    .btn-wa     { flex: 1.5; background: #1aaa5e; color: #fff; font-size: 14px; }
+    .btn-limpar { width: 44px; background: var(--bg3); color: var(--text2); border: 1px solid var(--border); font-size: 18px; }
 
-    /* MODAL */
-    .modal-bg {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.7); z-index: 200;
-      align-items: flex-end; justify-content: center;
-    }
+    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: flex-end; justify-content: center; }
     .modal-bg.open { display: flex; }
-    .modal-box {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: var(--radius) var(--radius) 0 0;
-      padding: 16px; width: 100%; max-height: 85vh; overflow-y: auto;
-    }
+    .modal-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; padding: 16px; width: 100%; max-height: 85vh; overflow-y: auto; }
     .modal-box h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
-    .modal-box textarea {
-      width: 100%; height: 220px; padding: 10px;
-      background: var(--bg3); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); color: var(--text);
-      font-size: 12px; font-family: 'Courier New', monospace; resize: none;
-    }
-    .modal-hint {
-      font-size: 11px; color: var(--text2); margin-top: 8px; line-height: 1.5;
-      background: rgba(30,111,196,0.1); border: 1px solid rgba(30,111,196,0.2);
-      border-radius: var(--radius-sm); padding: 8px 10px;
-    }
+    .modal-box textarea { width: 100%; height: 240px; padding: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 12px; font-family: 'Courier New', monospace; resize: none; }
+    .modal-hint { font-size: 11px; color: var(--text2); margin-top: 8px; line-height: 1.5; background: rgba(30,111,196,0.1); border: 1px solid rgba(30,111,196,0.2); border-radius: var(--radius-sm); padding: 8px 10px; }
     .modal-footer { display: flex; gap: 8px; margin-top: 12px; }
     .modal-footer .btn { flex: 1; height: 40px; font-size: 13px; }
 
-    /* TOAST */
-    .toast {
-      position: fixed; top: 70px; left: 50%;
-      transform: translateX(-50%) translateY(-20px);
-      background: var(--bg3); border: 1px solid var(--border2);
-      color: var(--text); padding: 8px 16px; border-radius: 20px;
-      font-size: 13px; font-weight: 600; z-index: 999;
-      opacity: 0; transition: all 0.3s; pointer-events: none; white-space: nowrap;
-    }
+    .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 999; opacity: 0; transition: all 0.3s; pointer-events: none; white-space: nowrap; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ===== HISTÓRICO ===== */
-    .hist-search-bar {
-      display: flex; gap: 8px; padding: 14px 16px 0;
-    }
-    .hist-search-bar input {
-      flex: 1; height: 44px; padding: 0 14px;
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); color: var(--text);
-      font-size: 14px; font-family: inherit;
-    }
+    /* HISTÓRICO */
+    .hist-search-bar { display: flex; gap: 8px; padding: 14px 16px 0; }
+    .hist-search-bar input { flex: 1; height: 44px; padding: 0 14px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 14px; font-family: inherit; }
     .hist-search-bar input:focus { outline: none; border-color: var(--blue-light); }
     .hist-search-bar input::placeholder { color: var(--text3); }
-    .hist-search-bar button {
-      height: 44px; padding: 0 18px;
-      background: var(--blue); color: #fff;
-      border: none; border-radius: var(--radius);
-      font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
-    }
-
+    .hist-search-bar button { height: 44px; padding: 0 18px; background: var(--blue); color: #fff; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; }
     .hist-results { padding: 12px 16px 0; }
-
-    .hist-empty {
-      text-align: center; padding: 40px 20px;
-      color: var(--text3); font-size: 13px; line-height: 1.8;
-    }
+    .hist-empty { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 13px; line-height: 1.8; }
     .hist-empty span { font-size: 32px; display: block; margin-bottom: 10px; }
-
-    .hist-pat-title {
-      font-size: 13px; font-weight: 700; color: var(--text2);
-      margin-bottom: 10px; padding-bottom: 6px;
-      border-bottom: 1px solid var(--border);
-    }
+    .hist-pat-title { font-size: 13px; font-weight: 700; color: var(--text2); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
     .hist-pat-title strong { color: var(--blue-light); font-size: 15px; }
-
-    .hist-item {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 12px 14px;
-      margin-bottom: 8px; position: relative;
-    }
-    .hist-item-top {
-      display: flex; align-items: flex-start;
-      justify-content: space-between; gap: 8px; margin-bottom: 6px;
-    }
-    .hist-item-eq  { font-size: 13px; font-weight: 600; flex: 1; }
-    .hist-item-meta {
-      font-size: 11px; color: var(--text3);
-      display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px;
-    }
-    .hist-item-meta span { display: flex; align-items: center; gap: 3px; }
-    .hist-item-obs {
-      font-size: 11px; color: var(--text2); margin-top: 6px;
-      padding-top: 6px; border-top: 1px solid var(--border);
-      font-style: italic;
-    }
+    .hist-item { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px; }
+    .hist-item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .hist-item-eq { font-size: 13px; font-weight: 600; flex: 1; }
+    .hist-item-meta { font-size: 11px; color: var(--text3); display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+    .hist-item-obs { font-size: 11px; color: var(--text2); margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); font-style: italic; }
     .hist-dir-entrada { color: #7AF5C0; font-size: 11px; font-weight: 700; }
     .hist-dir-saida   { color: #F5A0A0; font-size: 11px; font-weight: 700; }
+    .hist-item-actions { display: flex; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+    .hist-btn { height: 28px; padding: 0 10px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 600; font-family: inherit; cursor: pointer; border: 1px solid var(--border); background: var(--bg3); color: var(--text2); }
+    .hist-btn.danger { background: rgba(184,50,50,0.12); border-color: rgba(184,50,50,0.3); color: var(--red-light); }
+    .hist-all-toggle { text-align: center; padding: 10px 16px 0; }
+    .hist-all-toggle button { background: none; border: 1px solid var(--border2); border-radius: var(--radius); color: var(--text2); font-size: 12px; font-family: inherit; padding: 8px 20px; cursor: pointer; }
 
-    .hist-all-toggle {
-      text-align: center; padding: 10px 16px 0;
-    }
-    .hist-all-toggle button {
-      background: none; border: 1px solid var(--border2);
-      border-radius: var(--radius); color: var(--text2);
-      font-size: 12px; font-family: inherit; padding: 8px 20px; cursor: pointer;
-    }
+    /* MODAL EDITAR */
+    .edit-field { margin-bottom: 10px; }
+    .edit-field label { display: block; font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .edit-field input, .edit-field select { width: 100%; height: 36px; padding: 0 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 13px; font-family: inherit; -webkit-appearance: none; }
+    .edit-field input:focus, .edit-field select:focus { outline: none; border-color: var(--blue-light); }
 
     select option { background: #1A3358; color: #E8F0FA; }
   </style>
@@ -315,7 +155,6 @@
   <p id="header-sub">Ferroviários — nova folha</p>
 </div>
 
-<!-- ABAS -->
 <div class="tabs">
   <div class="tab active" id="tab-folha" onclick="mudarAba('folha')">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="12" height="12" rx="2"/><line x1="5" y1="6" x2="11" y2="6"/><line x1="5" y1="9" x2="11" y2="9"/><line x1="5" y1="12" x2="8" y2="12"/></svg>
@@ -327,67 +166,44 @@
   </div>
 </div>
 
-<!-- PÁGINA: NOVA FOLHA -->
+<!-- PÁGINA FOLHA -->
 <div class="page active" id="page-folha">
   <div class="section">
     <div class="section-title">Cabeçalho da folha</div>
     <div class="card">
       <div class="header-grid">
-        <div class="field">
-          <label>Folha Nº</label>
-          <input type="text" id="nfolha" value="001">
-        </div>
-        <div class="field">
-          <label>Data</label>
-          <input type="date" id="fdata">
-        </div>
-        <div class="field full">
-          <label>Empresa</label>
-          <input type="text" id="empresa" placeholder="Nome da empresa">
-        </div>
-        <div class="field">
-          <label>Contrato</label>
-          <input type="text" id="contrato" placeholder="Nº ou nome">
-        </div>
-        <div class="field">
-          <label>Cidade</label>
-          <input type="text" id="cidade" placeholder="Cidade">
-        </div>
+        <div class="field"><label>Folha Nº</label><input type="text" id="nfolha" value="001"></div>
+        <div class="field"><label>Data</label><input type="date" id="fdata"></div>
+        <div class="field full"><label>Empresa</label><input type="text" id="empresa" placeholder="Nome da empresa"></div>
+        <div class="field"><label>Contrato</label><input type="text" id="contrato" placeholder="Nº ou nome"></div>
+        <div class="field"><label>Cidade</label><input type="text" id="cidade" placeholder="Cidade"></div>
+        <div class="field full"><label>Observação geral</label><input type="text" id="obs-geral" placeholder="Observação geral da folha (opcional)" autocomplete="off"></div>
       </div>
     </div>
   </div>
-
   <div class="section">
     <div class="section-title">Equipamentos</div>
-    <div class="summary" id="summary-bar">
-      <span class="summary-empty">Nenhum item ainda</span>
-    </div>
+    <div class="summary" id="summary-bar"><span class="summary-empty">Nenhum item ainda</span></div>
     <div id="eq-rows"></div>
     <button class="btn-add" onclick="addRow()">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-        <line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/>
-      </svg>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
       Adicionar equipamento
     </button>
     <div class="count-badge" id="count-label">0 itens na folha</div>
   </div>
 </div>
 
-<!-- PÁGINA: HISTÓRICO -->
+<!-- PÁGINA HISTÓRICO -->
 <div class="page" id="page-hist">
   <div class="hist-search-bar">
-    <input type="text" id="hist-input" placeholder="Digite o nº de patrimônio..." inputmode="text" autocomplete="off"
-      onkeydown="if(event.key==='Enter') pesquisarHist()">
+    <input type="text" id="hist-input" placeholder="Digite o nº de patrimônio..." inputmode="text" autocomplete="off" onkeydown="if(event.key==='Enter') pesquisarHist()">
     <button onclick="pesquisarHist()">Buscar</button>
   </div>
   <div class="hist-all-toggle">
     <button onclick="mostrarTodos()">Ver todos os registros</button>
   </div>
   <div class="hist-results" id="hist-results">
-    <div class="hist-empty">
-      <span>🔍</span>
-      Digite o número do patrimônio<br>para ver o histórico completo.
-    </div>
+    <div class="hist-empty"><span>🔍</span>Digite o número do patrimônio<br>para ver o histórico completo.</div>
   </div>
 </div>
 
@@ -405,19 +221,48 @@
   </div>
 </div>
 
+<!-- Modal Editar registro -->
+<div class="modal-bg" id="modal-edit">
+  <div class="modal-box">
+    <h3>✏️ Editar registro</h3>
+    <div class="edit-field"><label>Equipamento</label>
+      <select id="edit-eq">
+        <option>CARRINHO C/ SUPORTE</option><option>ESMERILHADEIRA ELÉTRICA MP5</option>
+        <option>ESMERILHADEIRA ELÉTRICA MP12</option><option>FURADEIRA DORMENTE PT8</option>
+        <option>FURADEIRA DORMENTE PORTÁTIL</option><option>FURADEIRA TRILHO VÍDEA</option>
+        <option>GERADOR DE ENERGIA BRANCO</option><option>MACACO MECÂNICO</option>
+        <option>MACACO HIDRÁULICO</option><option>PÉ DE PATO (SOCADOR MANUAL)</option>
+        <option>POLICORTE</option><option>REBARBADORA</option>
+        <option>TIREFONADORA PORTÁTIL</option><option>CONJUNTO AUTOPORTANTE</option>
+        <option>GERADOR JACKSON</option>
+      </select>
+    </div>
+    <div class="edit-field"><label>Patrimônio</label><input type="text" id="edit-pat"></div>
+    <div class="edit-field"><label>Legenda</label>
+      <select id="edit-leg">
+        <option value="RM">RM — Retirada manutenção</option>
+        <option value="DM">DM — Devolução manutenção</option>
+        <option value="L">L — Nova locação</option>
+        <option value="D">D — Devolução de locação</option>
+        <option value="S">S — Substituição</option>
+      </select>
+    </div>
+    <div class="edit-field"><label>Observação</label><input type="text" id="edit-obs"></div>
+    <div class="modal-footer">
+      <button class="btn" style="background:var(--blue);color:#fff" onclick="salvarEdicao()">Salvar</button>
+      <button class="btn" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border)" onclick="fecharModal('modal-edit')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Footer -->
 <div class="footer-actions" id="footer-folha">
   <button class="btn btn-salvar" onclick="salvarRegistro()">
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-      <path d="M13 2H3a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V5l-3-3z"/>
-      <polyline points="13 5 10 5 10 2"/><rect x="4" y="9" width="8" height="5"/>
-    </svg>
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2H3a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V5l-3-3z"/><polyline points="13 5 10 5 10 2"/><rect x="4" y="9" width="8" height="5"/></svg>
     Salvar
   </button>
   <button class="btn btn-wa" onclick="gerarWhatsapp()">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-      <path d="M8 0C3.58 0 0 3.58 0 8c0 1.4.37 2.72 1.02 3.86L0 16l4.26-1.01A8 8 0 108 0zm0 14.4A6.4 6.4 0 012.8 5.2a6.4 6.4 0 0110.9 4.52A6.4 6.4 0 018 14.4zm3.5-4.8c-.19-.1-1.12-.56-1.3-.62-.17-.06-.3-.1-.42.1-.12.19-.47.62-.58.75-.1.13-.22.14-.41.05-.2-.1-.83-.31-1.58-.99-.58-.52-.98-1.16-1.09-1.36-.11-.19-.01-.3.08-.39l.38-.44c.09-.1.12-.19.18-.32.06-.13.03-.24-.01-.34-.05-.1-.43-1.03-.59-1.41-.15-.36-.31-.31-.43-.32H5.6c-.12 0-.32.05-.48.24-.17.19-.64.62-.64 1.52s.65 1.76.74 1.88c.1.13 1.27 1.93 3.07 2.71.43.19.77.3 1.03.38.43.14.83.12 1.14.07.35-.05 1.07-.44 1.22-.86.15-.42.15-.78.1-.86-.04-.08-.17-.13-.36-.22z"/>
-    </svg>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 1.4.37 2.72 1.02 3.86L0 16l4.26-1.01A8 8 0 108 0zm0 14.4A6.4 6.4 0 012.8 5.2a6.4 6.4 0 0110.9 4.52A6.4 6.4 0 018 14.4zm3.5-4.8c-.19-.1-1.12-.56-1.3-.62-.17-.06-.3-.1-.42.1-.12.19-.47.62-.58.75-.1.13-.22.14-.41.05-.2-.1-.83-.31-1.58-.99-.58-.52-.98-1.16-1.09-1.36-.11-.19-.01-.3.08-.39l.38-.44c.09-.1.12-.19.18-.32.06-.13.03-.24-.01-.34-.05-.1-.43-1.03-.59-1.41-.15-.36-.31-.31-.43-.32H5.6c-.12 0-.32.05-.48.24-.17.19-.64.62-.64 1.52s.65 1.76.74 1.88c.1.13 1.27 1.93 3.07 2.71.43.19.77.3 1.03.38.43.14.83.12 1.14.07.35-.05 1.07-.44 1.22-.86.15-.42.15-.78.1-.86-.04-.08-.17-.13-.36-.22z"/></svg>
     Gerar WhatsApp
   </button>
   <button class="btn btn-limpar" onclick="confirmarLimpar()" title="Limpar tudo">🗑</button>
@@ -430,8 +275,7 @@ const EQS = [
   "CARRINHO C/ SUPORTE","ESMERILHADEIRA ELÉTRICA MP5","ESMERILHADEIRA ELÉTRICA MP12",
   "FURADEIRA DORMENTE PT8","FURADEIRA DORMENTE PORTÁTIL","FURADEIRA TRILHO VÍDEA",
   "GERADOR DE ENERGIA BRANCO","MACACO MECÂNICO","MACACO HIDRÁULICO",
-  "PÉ DE PATO (SOCADOR MANUAL)","POLICORTE (GEISMAR)","POLICORTE (HUSQVARNA)",
-  "REBARBADORA HIDRÁULICA (GESIMAR)","REBARBADORA HIDRÁULICA (NACIONAIS)",
+  "PÉ DE PATO (SOCADOR MANUAL)","POLICORTE","REBARBADORA",
   "TIREFONADORA PORTÁTIL","CONJUNTO AUTOPORTANTE","GERADOR JACKSON"
 ];
 
@@ -441,36 +285,29 @@ const LEGS = [
   {v:"DM", l:"DM — Devolução manutenção"},
   {v:"L",  l:"L — Nova locação"},
   {v:"D",  l:"D — Devolução de locação"},
-  {v:"SE", l:"SE — Substituição entrada"},
-  {v:"SS", l:"SS — Substituição saída"}
+  {v:"S",  l:"S — Substituição"}
 ];
 
 const LEG_MAP = {
   RM:"Retirada manutenção", DM:"Devolução manutenção",
   L:"Nova locação",         D:"Devolução de locação",
-  SE:"Substituição entrada",SS:"Substituição saída"
+  S:"Substituição"
 };
 
-const LEG_CLS = {
-  RM:"badge-RM", DM:"badge-DM", L:"badge-L",
-  D:"badge-D",   SE:"badge-SE", SS:"badge-SS"
-};
+const LEG_CLS = { RM:"badge-RM", DM:"badge-DM", L:"badge-L", D:"badge-D", S:"badge-S" };
 
 const LEG_DIR = {
-  RM:"← Entrada | Retirada manutenção",
-  DM:"→ Saída | Devolução manutenção",
-  L: "→ Saída | Nova locação",
-  D: "← Entrada | Devolução de locação",
-  SE:"← Entrada | Substituição entrada",
-  SS:"→ Saída | Substituição saída"
+  RM: "← Entrada | Retirada manutenção",
+  DM: "→ Saída | Devolução manutenção",
+  L:  "→ Saída | Nova locação",
+  D:  "← Entrada | Devolução de locação",
+  S:  "Substituição"
 };
 
-// Entrada = verde, Saída = vermelho
-const LEG_SENTIDO = {
-  RM:"entrada", DM:"saida", L:"saida", D:"entrada", SE:"entrada", SS:"saida"
-};
+const LEG_SENTIDO = { RM:"entrada", DM:"saida", L:"saida", D:"entrada", S:"subst" };
 
 let rowCount = 0;
+let editIdx  = null;
 
 document.getElementById('fdata').value = new Date().toISOString().split('T')[0];
 atualizarHeaderSub();
@@ -484,7 +321,6 @@ function atualizarHeaderSub() {
 document.getElementById('empresa').addEventListener('input', atualizarHeaderSub);
 document.getElementById('contrato').addEventListener('input', atualizarHeaderSub);
 
-/* ========== ABAS ========== */
 function mudarAba(aba) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -494,7 +330,6 @@ function mudarAba(aba) {
   if (aba === 'hist') document.getElementById('hist-input').focus();
 }
 
-/* ========== FOLHA ========== */
 function eqOpts(sel) {
   return ['<option value="">— equipamento —</option>',
     ...EQS.map(e => `<option value="${e}"${e===sel?' selected':''}>${e}</option>`)
@@ -518,16 +353,13 @@ function addRow() {
       <div class="del-btn" onclick="removeRow(${id})">✕</div>
     </div>
     <div class="eq-item-body">
-      <div>
-        <label>Patrimônio</label>
+      <div><label>Patrimônio</label>
         <input type="text" id="pat-${id}" placeholder="Número do patrimônio" oninput="atualizar()" inputmode="text" autocomplete="off">
       </div>
-      <div>
-        <label>Legenda</label>
+      <div><label>Legenda</label>
         <select id="leg-${id}" onchange="onLegChange(${id})">${legOpts('')}</select>
       </div>
-      <div>
-        <label>Observação</label>
+      <div><label>Observação</label>
         <input type="text" id="obs-${id}" placeholder="Observação (opcional)" autocomplete="off">
       </div>
     </div>
@@ -536,14 +368,13 @@ function addRow() {
         <p>↕ Substituição — informe os dois patrimônios:</p>
         <div class="subst-grid">
           <div class="subst-card saiu">
-            <label>↑ Saiu</label>
-            <input type="text" id="pat-saiu-${id}" placeholder="Pat. que saiu" oninput="onSaiuInput(${id})">
+            <label>→ Saiu da oficina</label>
+            <input type="text" id="pat-saiu-${id}" placeholder="Nº patrimônio" oninput="atualizar()">
             <div class="subst-ref" id="ref-saiu-${id}"></div>
-            <div class="rm-alert" id="rm-alert-${id}">⚠ Nenhum RM encontrado para este patrimônio.</div>
           </div>
           <div class="subst-card entrou">
-            <label>↓ Entrou</label>
-            <input type="text" id="pat-entrou-${id}" placeholder="Pat. que entrou">
+            <label>← Entrou na oficina</label>
+            <input type="text" id="pat-entrou-${id}" placeholder="Nº patrimônio" oninput="onEntrouInput(${id})">
             <div class="subst-ref" id="ref-entrou-${id}"></div>
           </div>
         </div>
@@ -558,32 +389,24 @@ function addRow() {
 function onLegChange(id) {
   const leg = document.getElementById('leg-' + id).value;
   const sp  = document.getElementById('sp-'  + id);
-  if (leg === 'SE' || leg === 'SS') {
-    sp.classList.add('show');
-    const pat = document.getElementById('pat-' + id).value.trim();
-    if (pat) document.getElementById('pat-entrou-' + id).value = pat;
-  } else {
-    sp.classList.remove('show');
-  }
+  sp.classList.toggle('show', leg === 'S');
   atualizar();
 }
 
-function onSaiuInput(id) {
-  const pat   = document.getElementById('pat-saiu-' + id).value.trim().toUpperCase();
-  const al    = document.getElementById('rm-alert-' + id);
-  const ref   = document.getElementById('ref-saiu-' + id);
-  if (!pat) { al.classList.remove('show'); ref.textContent = ''; return; }
+function onEntrouInput(id) {
+  const pat   = document.getElementById('pat-entrou-' + id).value.trim().toUpperCase();
+  const ref   = document.getElementById('ref-entrou-' + id);
+  if (!pat) { ref.textContent = ''; ref.className = 'subst-ref'; return; }
   const hist  = getHistorico();
   const found = hist.find(h => h.pat.toUpperCase() === pat && h.leg === 'RM');
   if (found) {
-    al.classList.remove('show');
-    ref.textContent = '✓ RM em ' + found.data + ' — Folha ' + found.folha;
+    ref.textContent  = '✓ RM ref.: Folha ' + found.folha + ' | ' + found.data;
     ref.className = 'subst-ref ok';
   } else {
-    al.classList.add('show');
-    ref.textContent = '';
-    ref.className = 'subst-ref';
+    ref.textContent = '⚠ Nenhum RM encontrado para este patrimônio';
+    ref.className = 'subst-ref warn';
   }
+  atualizar();
 }
 
 function removeRow(id) {
@@ -617,39 +440,71 @@ function atualizar() {
     .join('');
 }
 
-/* ========== HISTÓRICO ========== */
+/* ===== HISTÓRICO ===== */
 function getHistorico() {
   try { return JSON.parse(localStorage.getItem('hist_completo') || '[]'); } catch(e) { return []; }
 }
 
-function salvarHistorico(registros) {
-  const hist  = getHistorico();
-  const nf    = document.getElementById('nfolha').value   || '—';
-  const dt    = document.getElementById('fdata').value    || '—';
-  const emp   = document.getElementById('empresa').value  || '—';
-  const ctto  = document.getElementById('contrato').value || '—';
-  const cid   = document.getElementById('cidade').value   || '—';
-  const dtFmt = dt ? dt.split('-').reverse().join('/') : dt;
+function salvarHistoricoLS(hist) {
+  try { localStorage.setItem('hist_completo', JSON.stringify(hist.slice(-1000))); } catch(e) {}
+}
+
+function salvarRegistro() {
+  const nf   = document.getElementById('nfolha').value.trim()   || '—';
+  const dt   = document.getElementById('fdata').value           || '—';
+  const emp  = document.getElementById('empresa').value.trim()  || '—';
+  const ctto = document.getElementById('contrato').value.trim() || '—';
+  const cid  = document.getElementById('cidade').value.trim()   || '—';
+  const obsG = document.getElementById('obs-geral').value.trim();
+  const dtFmt= dt ? dt.split('-').reverse().join('/') : dt;
+
+  const rows = document.querySelectorAll('#eq-rows .eq-item');
+  let registros = [];
+  rows.forEach(r => {
+    const rid    = r.id.replace('item-', '');
+    const eq     = document.getElementById('eq-'  + rid)?.value       || '';
+    const pat    = document.getElementById('pat-' + rid)?.value.trim() || '';
+    const leg    = document.getElementById('leg-' + rid)?.value       || '';
+    const obs    = document.getElementById('obs-' + rid)?.value.trim() || '';
+    const saiu   = document.getElementById('pat-saiu-'   + rid)?.value.trim() || '';
+    const entrou = document.getElementById('pat-entrou-' + rid)?.value.trim() || '';
+    if (pat) registros.push({eq, pat, leg, obs, saiu, entrou});
+  });
+
+  if (!registros.length) { toast('Nenhum item para salvar ⚠'); return; }
+
+  // Bloquear folha duplicada
+  const hist = getHistorico();
+  const jaExiste = hist.some(h => h.folha === nf && h.empresa === emp);
+  if (jaExiste) {
+    if (!confirm(`A folha ${nf} já foi salva para ${emp}.\nDeseja salvar mesmo assim?`)) return;
+  }
+
   registros.forEach(r => {
     hist.push({
-      pat: r.pat, eq: r.eq, leg: r.leg, obs: r.obs||'',
+      pat: r.pat, eq: r.eq, leg: r.leg, obs: r.obs, obsGeral: obsG,
+      saiu: r.saiu, entrou: r.entrou,
       folha: nf, data: dtFmt, empresa: emp, contrato: ctto, cidade: cid,
       ts: Date.now()
     });
   });
-  try { localStorage.setItem('hist_completo', JSON.stringify(hist.slice(-1000))); } catch(e) {}
-  // Mantém também o hist_rm para compatibilidade com verificação de substituição
-  const histRm = JSON.parse(localStorage.getItem('hist_rm')||'[]');
-  registros.forEach(r => { if (r.leg==='RM') histRm.push({pat:r.pat,eq:r.eq,leg:'RM',folha:nf,data:dtFmt}); });
+  salvarHistoricoLS(hist);
+
+  // Salva também hist_rm para compatibilidade
+  const histRm = JSON.parse(localStorage.getItem('hist_rm') || '[]');
+  registros.forEach(r => { if (r.leg === 'RM') histRm.push({pat:r.pat, eq:r.eq, leg:'RM', folha:nf, data:dtFmt}); });
   try { localStorage.setItem('hist_rm', JSON.stringify(histRm.slice(-300))); } catch(e) {}
+
+  toast(`Salvo! ${registros.length} item(ns) ✓`);
 }
 
+/* ===== PESQUISA HISTÓRICO ===== */
 function pesquisarHist() {
   const q = document.getElementById('hist-input').value.trim().toUpperCase();
   if (!q) { mostrarTodos(); return; }
   const hist = getHistorico();
-  const resultados = hist.filter(h => h.pat.toUpperCase().includes(q));
-  renderizarHist(resultados, q);
+  const res  = hist.filter(h => h.pat.toUpperCase().includes(q));
+  renderizarHist(res, q);
 }
 
 function mostrarTodos() {
@@ -668,43 +523,42 @@ function renderizarHist(resultados, query) {
     cont.innerHTML = `<div class="hist-empty"><span>🔍</span>Nenhum registro encontrado<br>para o patrimônio <strong>${query}</strong>.</div>`;
     return;
   }
-
-  // Agrupa por patrimônio se busca específica, senão mostra cronológico reverso
+  const hist     = getHistorico();
   const ordenados = [...resultados].sort((a,b) => (b.ts||0) - (a.ts||0));
 
   if (query) {
-    // Agrupa por patrimônio
     const grupos = {};
     ordenados.forEach(r => {
       const k = r.pat.toUpperCase();
       if (!grupos[k]) grupos[k] = [];
       grupos[k].push(r);
     });
-
     let html = '';
     Object.entries(grupos).forEach(([pat, itens]) => {
-      html += `<div class="hist-pat-title">Patrimônio <strong>${pat}</strong> — ${itens[0].eq || '—'} &nbsp;·&nbsp; ${itens.length} registro(s)</div>`;
-      itens.forEach(r => { html += cartaoHist(r); });
+      html += `<div class="hist-pat-title">Patrimônio <strong>${pat}</strong> — ${itens[0].eq||'—'} &nbsp;·&nbsp; ${itens.length} registro(s)</div>`;
+      itens.forEach(r => { html += cartaoHist(r, hist.indexOf(r)); });
     });
     cont.innerHTML = html;
   } else {
-    // Todos: cronológico reverso
     cont.innerHTML = `<div style="font-size:11px;color:var(--text3);margin-bottom:10px">${ordenados.length} registro(s) no total</div>` +
-      ordenados.map(cartaoHist).join('');
+      ordenados.map(r => cartaoHist(r, hist.indexOf(r))).join('');
   }
 }
 
-function cartaoHist(r) {
-  const sentido = LEG_SENTIDO[r.leg] || '';
-  const dirClass = sentido === 'entrada' ? 'hist-dir-entrada' : 'hist-dir-saida';
-  const dirIcon  = sentido === 'entrada' ? '←' : '→';
-  const dirLabel = sentido === 'entrada' ? 'Entrada' : 'Saída';
-  const obsHtml  = r.obs ? `<div class="hist-item-obs">Obs: ${r.obs}</div>` : '';
+function cartaoHist(r, idx) {
+  const s       = LEG_SENTIDO[r.leg] || '';
+  const dirClass = s === 'entrada' ? 'hist-dir-entrada' : s === 'saida' ? 'hist-dir-saida' : '';
+  const dirIcon  = s === 'entrada' ? '←' : s === 'saida' ? '→' : '↕';
+  const dirLabel = s === 'entrada' ? 'Entrada' : s === 'saida' ? 'Saída' : 'Substituição';
+  const obsHtml  = r.obs     ? `<div class="hist-item-obs">Obs: ${r.obs}</div>` : '';
+  const obsGHtml = r.obsGeral? `<div class="hist-item-obs" style="color:var(--text3)">📝 Obs geral: ${r.obsGeral}</div>` : '';
+  const substHtml = r.leg === 'S' && (r.saiu || r.entrou) ?
+    `<div style="font-size:11px;color:var(--text2);margin-top:4px">→ Saiu: ${r.saiu||'—'} &nbsp;|&nbsp; ← Entrou: ${r.entrou||'—'}</div>` : '';
   return `
     <div class="hist-item">
       <div class="hist-item-top">
         <div>
-          <div class="hist-item-eq">${r.eq || '—'}</div>
+          <div class="hist-item-eq">${r.eq||'—'}</div>
           <div class="hist-item-meta">
             <span class="${dirClass}">${dirIcon} ${dirLabel}</span>
             <span class="badge ${LEG_CLS[r.leg]||''}" style="padding:1px 6px;font-size:10px">${r.leg}</span>
@@ -719,47 +573,108 @@ function cartaoHist(r) {
       <div class="hist-item-meta" style="margin-top:4px">
         <span>🏢 ${r.empresa||'—'}</span>
         ${r.contrato ? `<span>📄 ${r.contrato}</span>` : ''}
-        ${r.cidade ? `<span>📍 ${r.cidade}</span>` : ''}
+        ${r.cidade   ? `<span>📍 ${r.cidade}</span>`   : ''}
       </div>
+      ${substHtml}
       ${obsHtml}
+      ${obsGHtml}
+      <div class="hist-item-actions">
+        <button class="hist-btn" onclick="abrirEdicao(${idx})">✏️ Editar</button>
+        <button class="hist-btn danger" onclick="apagarRegistro(${idx})">🗑 Apagar</button>
+      </div>
     </div>
   `;
 }
 
-/* ========== WHATSAPP ========== */
+/* ===== EDITAR / APAGAR ===== */
+function abrirEdicao(idx) {
+  const hist = getHistorico();
+  const r    = hist[idx];
+  if (!r) return;
+  editIdx = idx;
+  document.getElementById('edit-eq').value  = r.eq  || '';
+  document.getElementById('edit-pat').value = r.pat || '';
+  document.getElementById('edit-leg').value = r.leg || '';
+  document.getElementById('edit-obs').value = r.obs || '';
+  document.getElementById('modal-edit').classList.add('open');
+}
+
+function salvarEdicao() {
+  if (editIdx === null) return;
+  const hist = getHistorico();
+  hist[editIdx].eq  = document.getElementById('edit-eq').value;
+  hist[editIdx].pat = document.getElementById('edit-pat').value.trim();
+  hist[editIdx].leg = document.getElementById('edit-leg').value;
+  hist[editIdx].obs = document.getElementById('edit-obs').value.trim();
+  salvarHistoricoLS(hist);
+  fecharModal('modal-edit');
+  toast('Registro atualizado ✓');
+  mostrarTodos();
+}
+
+function apagarRegistro(idx) {
+  if (!confirm('Apagar este registro do histórico?')) return;
+  const hist = getHistorico();
+  hist.splice(idx, 1);
+  salvarHistoricoLS(hist);
+  toast('Registro apagado ✓');
+  mostrarTodos();
+}
+
+/* ===== WHATSAPP ===== */
 function gerarWhatsapp() {
   const nf   = document.getElementById('nfolha').value   || '—';
   const dt   = document.getElementById('fdata').value;
   const emp  = document.getElementById('empresa').value  || '—';
   const ctto = document.getElementById('contrato').value || '—';
   const cid  = document.getElementById('cidade').value   || '—';
-  const dtFmt = dt ? dt.split('-').reverse().join('/') : '—';
-  const rows  = document.querySelectorAll('#eq-rows .eq-item');
-  let linhas  = [];
+  const obsG = document.getElementById('obs-geral').value.trim();
+  const dtFmt= dt ? dt.split('-').reverse().join('/') : '—';
+
+  const rows = document.querySelectorAll('#eq-rows .eq-item');
+  let linhas = [];
+
   rows.forEach(r => {
-    const rid = r.id.replace('item-', '');
-    const eq  = document.getElementById('eq-'  + rid)?.value       || '';
-    const pat = document.getElementById('pat-' + rid)?.value.trim() || '';
-    const leg = document.getElementById('leg-' + rid)?.value       || '';
-    const obs = document.getElementById('obs-' + rid)?.value.trim() || '';
-    if (!pat || !leg) return;
-    let linha = `• ${eq||'—'}\n  Pat: ${pat} | ${LEG_MAP[leg]||leg}${obs?' | Obs: '+obs:''}`;
-    if (leg === 'SE' || leg === 'SS') {
-      const saiu   = document.getElementById('pat-saiu-'   + rid)?.value.trim() || '';
-      const entrou = document.getElementById('pat-entrou-' + rid)?.value.trim() || '';
-      if (saiu || entrou) linha += `\n  ↑ Saiu: ${saiu||'—'} → ↓ Entrou: ${entrou||'—'}`;
+    const rid    = r.id.replace('item-', '');
+    const eq     = document.getElementById('eq-'  + rid)?.value       || '';
+    const pat    = document.getElementById('pat-' + rid)?.value.trim() || '';
+    const leg    = document.getElementById('leg-' + rid)?.value       || '';
+    const obs    = document.getElementById('obs-' + rid)?.value.trim() || '';
+    const saiu   = document.getElementById('pat-saiu-'   + rid)?.value.trim() || '';
+    const entrou = document.getElementById('pat-entrou-' + rid)?.value.trim() || '';
+    if (!leg) return;
+
+    let bloco = `*${LEG_DIR[leg]||leg}*\n`;
+    bloco += `Equipamento: ${eq||'—'}\n`;
+
+    if (leg === 'S') {
+      bloco += `→ Saiu da oficina: ${saiu||'—'}\n`;
+      bloco += `← Entrou na oficina: ${entrou||'—'}\n`;
+      // Verificar RM do que entrou
+      if (entrou) {
+        const hist  = getHistorico();
+        const found = hist.find(h => h.pat.toUpperCase() === entrou.toUpperCase() && h.leg === 'RM');
+        if (found) bloco += `   RM ref.: Folha ${found.folha} | ${found.data}\n`;
+      }
+    } else {
+      if (pat) bloco += `Patrimônio: ${pat}\n`;
     }
-    linhas.push(linha);
+    if (obs) bloco += `Obs: ${obs}\n`;
+    linhas.push(bloco);
   });
+
   if (!linhas.length) { toast('Preencha ao menos um item ⚠'); return; }
-  const msg =
-    `*CONTROLE DE EQUIPAMENTOS*\n` +
-    `Folha: ${nf} | Data: ${dtFmt}\n` +
-    `Empresa: ${emp} | Contrato: ${ctto}\n` +
-    `Cidade: ${cid}\n` +
-    `${'─'.repeat(34)}\n` +
-    linhas.join('\n') + '\n' +
-    `${'─'.repeat(34)}`;
+
+  let msg = '';
+  msg += `*FOLHA: ${nf}*\n`;
+  msg += `Data: ${dtFmt}\n`;
+  msg += `Empresa: ${emp}\n`;
+  msg += `Contrato: ${ctto}\n`;
+  msg += `Cidade: ${cid}\n`;
+  msg += '\n';
+  msg += linhas.join('\n');
+  if (obsG) msg += `\nObs geral: ${obsG}\n`;
+
   document.getElementById('wa-text').value = msg;
   document.getElementById('modal-wa').classList.add('open');
 }
@@ -773,23 +688,6 @@ function abrirWA() {
   window.open('https://wa.me/?text=' + encodeURIComponent(document.getElementById('wa-text').value), '_blank');
 }
 function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
-
-/* ========== SALVAR ========== */
-function salvarRegistro() {
-  const rows = document.querySelectorAll('#eq-rows .eq-item');
-  let registros = [];
-  rows.forEach(r => {
-    const rid = r.id.replace('item-', '');
-    const eq  = document.getElementById('eq-'  + rid)?.value       || '';
-    const pat = document.getElementById('pat-' + rid)?.value.trim() || '';
-    const leg = document.getElementById('leg-' + rid)?.value       || '';
-    const obs = document.getElementById('obs-' + rid)?.value.trim() || '';
-    if (pat) registros.push({eq, pat, leg, obs});
-  });
-  if (!registros.length) { toast('Nenhum item para salvar ⚠'); return; }
-  salvarHistorico(registros);
-  toast(`Salvo! ${registros.length} item(ns) ✓`);
-}
 
 function confirmarLimpar() {
   if (confirm('Limpar todos os itens da folha?')) {
