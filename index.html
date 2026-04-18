@@ -42,6 +42,11 @@
     .field input:focus,.field select:focus{outline:none;border-color:var(--blue-light)}
     .field input::placeholder{color:var(--text3)}
 
+    /* Folha Nº editável com indicador visual */
+    .nfolha-wrap{position:relative;display:flex;align-items:center}
+    .nfolha-wrap input{padding-right:36px}
+    .nfolha-auto{position:absolute;right:8px;font-size:9px;font-weight:700;color:var(--green-light);text-transform:uppercase;letter-spacing:.04em;pointer-events:none;opacity:.8}
+
     .summary{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-height:36px;margin-bottom:10px}
     .summary-empty{font-size:12px;color:var(--text3)}
     .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
@@ -63,6 +68,10 @@
     .eq-item-body input:focus,.eq-item-body select:focus{outline:none;border-color:var(--blue-light)}
     .eq-item-body input::placeholder{color:var(--text3)}
     .eq-item-body label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:3px}
+
+    /* Campo patrimônio ocultável */
+    .pat-field-wrap{transition:all .2s}
+    .pat-field-wrap.hidden{display:none}
 
     .subst-panel{display:none;padding:0 12px 10px}
     .subst-panel.show{display:block}
@@ -158,7 +167,13 @@
     <div class="section-title">Cabeçalho da folha</div>
     <div class="card">
       <div class="header-grid">
-        <div class="field"><label>Folha Nº</label><input type="text" id="nfolha" value="001"></div>
+        <div class="field">
+          <label>Folha Nº</label>
+          <div class="nfolha-wrap">
+            <input type="text" id="nfolha" value="" autocomplete="off" inputmode="text">
+            <span class="nfolha-auto" id="nfolha-auto-indicator">AUTO</span>
+          </div>
+        </div>
         <div class="field"><label>Data</label><input type="date" id="fdata"></div>
         <div class="field full"><label>Empresa</label><input type="text" id="empresa" placeholder="Nome da empresa"></div>
         <div class="field"><label>Contrato</label><input type="text" id="contrato" placeholder="Nº ou nome"></div>
@@ -290,7 +305,45 @@ const LEG_SENTIDO = {RM:"entrada",DM:"saida",L:"saida",D:"entrada",S:"subst"};
 let rowCount = 0;
 let editIdx  = null;
 
+// ─── ALTERAÇÃO 1: Folha Nº automático ─────────────────────────────────────────
+// Calcula o próximo número de folha baseado no último salvo no histórico
+function calcularProximaFolha() {
+  const hist = getHistorico();
+  if (!hist.length) return '001';
+  // Coleta todos os números de folha salvos
+  const numeros = hist
+    .map(h => h.folha)
+    .filter(f => f && f !== '—')
+    .map(f => parseInt(f, 10))
+    .filter(n => !isNaN(n));
+  if (!numeros.length) return '001';
+  const max = Math.max(...numeros);
+  return String(max + 1).padStart(3, '0');
+}
+
+function inicializarFolhaNum() {
+  const prox = calcularProximaFolha();
+  const input = document.getElementById('nfolha');
+  const indicator = document.getElementById('nfolha-auto-indicator');
+  input.value = prox;
+  // Quando o usuário edita manualmente, some o indicador AUTO
+  input.addEventListener('input', () => {
+    indicator.style.display = 'none';
+  });
+}
+
+function prepararNovaFolha() {
+  // Recalcula o próximo número e reexibe o indicador AUTO
+  const prox = calcularProximaFolha();
+  const input = document.getElementById('nfolha');
+  const indicator = document.getElementById('nfolha-auto-indicator');
+  input.value = prox;
+  indicator.style.display = '';
+}
+// ──────────────────────────────────────────────────────────────────────────────
+
 document.getElementById('fdata').value = new Date().toISOString().split('T')[0];
+inicializarFolhaNum();
 atualizarHeaderSub();
 
 function atualizarHeaderSub() {
@@ -320,6 +373,7 @@ function legOpts(sel) {
   return LEGS.map(l => `<option value="${l.v}"${l.v===sel?' selected':''}>${l.l}</option>`).join('');
 }
 
+// ─── ALTERAÇÃO 2: Nova ordem dos campos + ocultar Patrimônio na Substituição ──
 function addRow() {
   const id   = rowCount++;
   const cont = document.getElementById('eq-rows');
@@ -327,6 +381,8 @@ function addRow() {
   const div  = document.createElement('div');
   div.className = 'eq-item';
   div.id = 'item-'+id;
+  // ORDEM: 1º Patrimônio  2º Legenda  3º Equipamento
+  // Patrimônio fica dentro de .pat-field-wrap para poder ser ocultado quando Substituição
   div.innerHTML = `
     <div class="eq-item-header">
       <span class="eq-num" id="rnum-${id}">${num}</span>
@@ -334,13 +390,16 @@ function addRow() {
       <div class="del-btn" onclick="removeRow(${id})">✕</div>
     </div>
     <div class="eq-item-body">
-      <div><label>Patrimônio</label>
+      <div class="pat-field-wrap" id="pat-wrap-${id}">
+        <label>Patrimônio</label>
         <input type="text" id="pat-${id}" placeholder="Número do patrimônio" oninput="atualizar()" inputmode="text" autocomplete="off">
       </div>
-      <div><label>Legenda</label>
+      <div>
+        <label>Legenda</label>
         <select id="leg-${id}" onchange="onLegChange(${id})">${legOpts('')}</select>
       </div>
-      <div><label>Observação</label>
+      <div>
+        <label>Observação</label>
         <input type="text" id="obs-${id}" placeholder="Observação (opcional)" autocomplete="off">
       </div>
     </div>
@@ -366,10 +425,20 @@ function addRow() {
   atualizar();
   setTimeout(() => div.scrollIntoView({behavior:'smooth',block:'center'}), 100);
 }
+// ──────────────────────────────────────────────────────────────────────────────
 
 function onLegChange(id) {
   const leg = document.getElementById('leg-'+id).value;
-  document.getElementById('sp-'+id).classList.toggle('show', leg==='S');
+  const isSubst = leg === 'S';
+
+  // Mostra/oculta painel de substituição
+  document.getElementById('sp-'+id).classList.toggle('show', isSubst);
+
+  // ─── ALTERAÇÃO 2b: Oculta campo Patrimônio quando é Substituição ──────────
+  const patWrap = document.getElementById('pat-wrap-'+id);
+  if (patWrap) patWrap.classList.toggle('hidden', isSubst);
+  // ─────────────────────────────────────────────────────────────────────────
+
   atualizar();
 }
 
@@ -426,6 +495,7 @@ function salvarHistoricoLS(hist) {
   try { localStorage.setItem('hist_completo', JSON.stringify(hist.slice(-1000))); } catch(e) {}
 }
 
+// ─── ALTERAÇÃO 3: Após salvar, abre nova folha automaticamente ────────────────
 function salvarRegistro() {
   const nf   = document.getElementById('nfolha').value.trim()   || '—';
   const dt   = document.getElementById('fdata').value           || '—';
@@ -446,7 +516,7 @@ function salvarRegistro() {
     const obs    = document.getElementById('obs-'+rid)?.value.trim() || '';
     const saiu   = document.getElementById('pat-saiu-'+rid)?.value.trim()   || '';
     const entrou = document.getElementById('pat-entrou-'+rid)?.value.trim() || '';
-    if (pat) registros.push({eq,pat,leg,obs,saiu,entrou});
+    if (pat || leg === 'S') registros.push({eq,pat,leg,obs,saiu,entrou});
   });
 
   if (!registros.length) { toast('Nenhum item para salvar ⚠'); return; }
@@ -468,8 +538,35 @@ function salvarRegistro() {
   registros.forEach(r => { if(r.leg==='RM') histRm.push({pat:r.pat,eq:r.eq,leg:'RM',folha:nf,data:dtFmt}); });
   try { localStorage.setItem('hist_rm', JSON.stringify(histRm.slice(-300))); } catch(e) {}
 
-  toast(`Salvo! ${registros.length} item(ns) ✓`);
+  toast(`Folha ${nf} salva! ${registros.length} item(ns) ✓`);
+
+  // Abre nova folha automaticamente após salvar
+  setTimeout(() => abrirNovaFolha(), 800);
 }
+
+function abrirNovaFolha() {
+  // Limpa os itens da folha
+  document.getElementById('eq-rows').innerHTML = '';
+  rowCount = 0;
+  atualizar();
+
+  // Mantém empresa/contrato/cidade (campos de contexto que costumam repetir)
+  // Limpa campos que mudam por folha
+  document.getElementById('nf').value = '';
+  document.getElementById('obs-geral').value = '';
+
+  // Atualiza data para hoje (caso tenha mudado de dia)
+  document.getElementById('fdata').value = new Date().toISOString().split('T')[0];
+
+  // Recalcula número da próxima folha automaticamente
+  prepararNovaFolha();
+
+  // Scroll para o topo
+  window.scrollTo({top: 0, behavior: 'smooth'});
+
+  toast('Nova folha pronta ✓');
+}
+// ──────────────────────────────────────────────────────────────────────────────
 
 /* ===== WHATSAPP — AGRUPADO POR MOVIMENTAÇÃO ===== */
 function gerarWhatsapp() {
@@ -484,7 +581,6 @@ function gerarWhatsapp() {
 
   const rows = document.querySelectorAll('#eq-rows .eq-item');
 
-  // Coleta itens válidos
   const itens = [];
   rows.forEach(r => {
     const rid    = r.id.replace('item-','');
@@ -500,7 +596,6 @@ function gerarWhatsapp() {
 
   if (!itens.length) { toast('Preencha ao menos um item ⚠'); return; }
 
-  // Agrupa por legenda mantendo ordem de aparição
   const grupos = {};
   const ordem  = [];
   itens.forEach(i => {
@@ -718,13 +813,11 @@ function exportarExcel() {
 
   const ws = XLSX.utils.json_to_sheet(linhas, {header: colunas});
 
-  // Larguras das colunas
   ws['!cols'] = [
     {wch:8},{wch:12},{wch:20},{wch:18},{wch:18},{wch:10},
     {wch:28},{wch:12},{wch:8},{wch:24},{wch:16},{wch:16},{wch:24}
   ];
 
-  // Filtros automáticos em todas as colunas
   ws['!autofilter'] = {ref: `A1:M${linhas.length+1}`};
 
   const wb = XLSX.utils.book_new();
