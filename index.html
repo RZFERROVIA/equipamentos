@@ -381,8 +381,7 @@ function addRow() {
   const div  = document.createElement('div');
   div.className = 'eq-item';
   div.id = 'item-'+id;
-  // ORDEM: 1º Patrimônio  2º Legenda  3º Equipamento
-  // Patrimônio fica dentro de .pat-field-wrap para poder ser ocultado quando Substituição
+  // ORDEM: 1º Equipamento (header)  2º Legenda  3º Patrimônio  4º Observação
   div.innerHTML = `
     <div class="eq-item-header">
       <span class="eq-num" id="rnum-${id}">${num}</span>
@@ -390,13 +389,13 @@ function addRow() {
       <div class="del-btn" onclick="removeRow(${id})">✕</div>
     </div>
     <div class="eq-item-body">
-      <div class="pat-field-wrap" id="pat-wrap-${id}">
-        <label>Patrimônio</label>
-        <input type="text" id="pat-${id}" placeholder="Número do patrimônio" oninput="atualizar()" inputmode="text" autocomplete="off">
-      </div>
       <div>
         <label>Legenda</label>
         <select id="leg-${id}" onchange="onLegChange(${id})">${legOpts('')}</select>
+      </div>
+      <div class="pat-field-wrap" id="pat-wrap-${id}">
+        <label>Patrimônio</label>
+        <input type="text" id="pat-${id}" placeholder="Número do patrimônio" oninput="atualizar()" inputmode="text" autocomplete="off">
       </div>
       <div>
         <label>Observação</label>
@@ -550,15 +549,16 @@ function abrirNovaFolha() {
   rowCount = 0;
   atualizar();
 
-  // Mantém empresa/contrato/cidade (campos de contexto que costumam repetir)
-  // Limpa campos que mudam por folha
+  // Limpa todos os campos do cabeçalho
+  document.getElementById('fdata').value = '';
+  document.getElementById('empresa').value = '';
+  document.getElementById('contrato').value = '';
+  document.getElementById('cidade').value = '';
   document.getElementById('nf').value = '';
   document.getElementById('obs-geral').value = '';
+  atualizarHeaderSub();
 
-  // Atualiza data para hoje (caso tenha mudado de dia)
-  document.getElementById('fdata').value = new Date().toISOString().split('T')[0];
-
-  // Recalcula número da próxima folha automaticamente
+  // Recalcula número da próxima folha (único campo que fica preenchido)
   prepararNovaFolha();
 
   // Scroll para o topo
