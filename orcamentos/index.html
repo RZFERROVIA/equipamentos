@@ -7,10 +7,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root {
-    --verde: #2a6b2a;
-    --verde-escuro: #1e4f1e;
-    --verde-claro: #e8f5e9;
-    --verde-medio: #c8e6c9;
+    --verde: #6b3a1f;
+    --verde-escuro: #4a2410;
+    --verde-claro: #f5ede8;
+    --verde-medio: #e6c9b5;
     --texto: #1a1a1a;
     --texto-sec: #555;
     --borda: #d4d4d4;
@@ -222,7 +222,7 @@
 <div class="app-header" id="app-header">
   <div>
     <h1>Casa do Dormente</h1>
-    <span id="header-sub">Orçamentos</span>
+    <span id="header-sub">Orçamentos — Casa do Dormente</span>
   </div>
   <button class="header-btn" id="header-action-btn" onclick="novoOrcamento()">+ Novo</button>
 </div>
@@ -271,7 +271,7 @@
     <div class="form-sec">
       <div class="form-sec-title">
         <span class="num-tag">2</span> Dormentes
-        <span class="dim-note">Padrão: 24 × 17 cm</span>
+        <span class="dim-note">Padrão: largura 0,24m × altura 0,17m</span>
       </div>
       <div id="items-list"></div>
       <button class="add-item-btn" onclick="addItem()">
@@ -585,7 +585,12 @@ function renderItems() {
           <button class="rmv-btn" onclick="removeItem(${item.id})">×</button>
         </div>
       </div>
-      <div class="g3">
+      <div class="g2">
+        <div class="field">
+          <label>Comprimento (m)</label>
+          <input type="number" min="0.01" step="0.01" placeholder="Ex: 2,00" value="${item.comprimento}"
+            oninput="updateItem(${item.id},'comprimento',this.value)">
+        </div>
         <div class="field">
           <label>Classe</label>
           <select onchange="updateItem(${item.id},'classe',this.value)">
@@ -594,16 +599,23 @@ function renderItems() {
             <option value="C" ${item.classe === 'C' ? 'selected' : ''}>C</option>
           </select>
         </div>
+      </div>
+      <div class="g2">
         <div class="field">
-          <label>Comp. (cm)</label>
-          <input type="number" min="1" placeholder="Ex: 200" value="${item.comprimento}"
-            oninput="updateItem(${item.id},'comprimento',this.value)">
+          <label>Largura (m) <span style="color:#aaa;font-weight:400">padrão 0,24</span></label>
+          <input type="number" min="0.01" step="0.01" placeholder="0,24" value="${item.largura || ''}"
+            oninput="updateItem(${item.id},'largura',this.value)">
         </div>
         <div class="field">
-          <label>Qtd (un)</label>
-          <input type="number" min="1" value="${item.qtd}"
-            oninput="updateItem(${item.id},'qtd',parseInt(this.value)||1)">
+          <label>Altura (m) <span style="color:#aaa;font-weight:400">padrão 0,17</span></label>
+          <input type="number" min="0.01" step="0.01" placeholder="0,17" value="${item.altura || ''}"
+            oninput="updateItem(${item.id},'altura',this.value)">
         </div>
+      </div>
+      <div class="field">
+        <label>Qtd (un)</label>
+        <input type="number" min="1" value="${item.qtd}"
+          oninput="updateItem(${item.id},'qtd',parseInt(this.value)||1)">
       </div>
       <div class="field">
         <label>Valor unitário (R$)</label>
@@ -636,7 +648,7 @@ function calcResumo() {
     const val = parseFloat(item.valor) || 0;
     const tot = qtd * val;
     subtotal += tot;
-    const comp = item.comprimento ? item.comprimento + ' cm' : '—';
+    const comp = item.comprimento ? parseFloat(item.comprimento).toFixed(2).replace('.',',') + 'm' : '—';
     return `<tr class="muted"><td>Item ${idx+1} · Cl.${item.classe} · ${comp} · ${qtd}un</td><td>${fmtMoeda(tot)}</td></tr>`;
   }).join('');
 
@@ -708,7 +720,7 @@ function _gerarPDFDados(orc, numero) {
   let y = 0;
 
   // Cabeçalho verde
-  doc.setFillColor(30, 79, 30);
+  doc.setFillColor(74, 36, 16);
   doc.rect(0, 0, 210, 18, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(13);
@@ -722,13 +734,13 @@ function _gerarPDFDados(orc, numero) {
   doc.text('Data: ' + fmtData(orc.data) + '   Validade: ' + (fmtData(orc.validade) || '—'), mR, 15, { align: 'right' });
 
   y = 28;
-  doc.setTextColor(30, 79, 30);
+  doc.setTextColor(74, 36, 16);
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('ORÇAMENTO', mL, y);
+  doc.text('ORÇAMENTO', 105, y, { align: 'center' });
 
   y += 8;
-  doc.setDrawColor(200, 230, 200);
+  doc.setDrawColor(210, 185, 165);
   doc.setLineWidth(0.3);
   doc.line(mL, y, mR, y);
 
@@ -740,30 +752,34 @@ function _gerarPDFDados(orc, numero) {
   y += 5;
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(30, 30, 30);
-  doc.text('Nome: ' + (orc.cliente || '—'), mL, y);
-  doc.text('Tel: ' + (orc.telefone || '—'), 110, y);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(74, 36, 16);
+  doc.text((orc.cliente || '—').toUpperCase(), mL, y);
   y += 5;
-  doc.text('Endereço: ' + (orc.cidade || '—'), mL, y);
-  doc.text('Status: ' + labelStatus(statusEfetivo(orc)), 140, y);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(60, 60, 60);
+  doc.text('Tel: ' + (orc.telefone || '—'), mL, y);
+  doc.text('Endereço: ' + (orc.cidade || '—'), 75, y);
+  doc.text('Status: ' + labelStatus(statusEfetivo(orc)), 158, y, { align: 'right' });
 
   y += 8;
-  doc.setDrawColor(200, 230, 200);
+  doc.setDrawColor(210, 185, 165);
   doc.line(mL, y, mR, y);
 
   y += 7;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
   doc.setTextColor(80, 80, 80);
-  doc.text('DORMENTES  |  Dimensão padrão: Largura 24 cm × Altura 17 cm', mL, y);
+  doc.text('DORMENTES  |  Dimensão padrão: Largura 0,24m × Altura 0,17m', mL, y);
 
   y += 6;
   // Cabeçalho tabela
-  doc.setFillColor(30, 79, 30);
+  doc.setFillColor(74, 36, 16);
   doc.rect(mL, y - 4.5, mR - mL, 7, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
-  const cols = [mL+2, mL+16, mL+32, mL+80, mL+102, mR-2];
+  const cols = [mL+2, mL+14, mL+28, mL+85, mL+107, mR-2];
   const headers = ['#', 'Classe', 'Dimensões (cm)', 'Qtd', 'Valor Un.', 'Total'];
   const aligns = ['left','left','left','left','left','right'];
   headers.forEach((h, i) => doc.text(h, cols[i], y, { align: aligns[i] }));
@@ -777,9 +793,11 @@ function _gerarPDFDados(orc, numero) {
     const val = parseFloat(item.valor) || 0;
     const tot = qtd * val;
     subtotal += tot;
-    const comp = item.comprimento ? item.comprimento : '—';
-    const dims = `24 × 17 × ${comp}`;
-    if (idx % 2 === 0) { doc.setFillColor(242, 250, 242); doc.rect(mL, y - 4.5, mR - mL, 7, 'F'); }
+    const comp = item.comprimento ? parseFloat(item.comprimento).toFixed(2).replace('.',',') + 'm' : '—';
+    const larg = item.largura ? parseFloat(item.largura).toFixed(2).replace('.',',') + 'm' : '0,24m';
+    const alt  = item.altura  ? parseFloat(item.altura).toFixed(2).replace('.',',')  + 'm' : '0,17m';
+    const dims = `C:${comp} L:${larg} A:${alt}`;
+    if (idx % 2 === 0) { doc.setFillColor(250, 245, 240); doc.rect(mL, y - 4.5, mR - mL, 7, 'F'); }
     const row = [String(idx+1), item.classe, dims, String(qtd), fmtMoeda(val), fmtMoeda(tot)];
     row.forEach((v, i) => doc.text(v, cols[i], y, { align: aligns[i] }));
     y += 7;
@@ -787,7 +805,7 @@ function _gerarPDFDados(orc, numero) {
   });
 
   y += 4;
-  doc.setDrawColor(200, 230, 200);
+  doc.setDrawColor(210, 185, 165);
   doc.setLineWidth(0.3);
   doc.line(mL, y, mR, y);
   y += 6;
@@ -802,9 +820,10 @@ function _gerarPDFDados(orc, numero) {
   const addLinha = (label, valor, bold) => {
     doc.setFont('helvetica', bold ? 'bold' : 'normal');
     doc.setFontSize(9);
-    doc.setTextColor(80, 80, 80);
-    doc.text(label, mR - 65, y);
+    doc.setTextColor(100, 100, 100);
+    doc.text(label, mR - 68, y, { align: 'right' });
     doc.setTextColor(30, 30, 30);
+    doc.setFont('helvetica', 'bold');
     doc.text(valor, mR - 2, y, { align: 'right' });
     y += 6;
   };
@@ -816,10 +835,10 @@ function _gerarPDFDados(orc, numero) {
   addLinha(freteLabel, freteValor, false);
 
   doc.setLineWidth(0.5);
-  doc.setDrawColor(30, 79, 30);
+  doc.setDrawColor(74, 36, 16);
   doc.line(mR - 67, y - 2, mR, y - 2);
   y += 3;
-  doc.setFillColor(30, 79, 30);
+  doc.setFillColor(74, 36, 16);
   doc.rect(mR - 67, y - 5, 67, 9, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
@@ -841,7 +860,12 @@ function _gerarPDFDados(orc, numero) {
 
   doc.setTextColor(160, 160, 160);
   doc.setFontSize(7.5);
-  doc.text('Casa do Dormente — Dormentes de Madeira de Qualidade', 105, 287, { align: 'center' });
+  doc.setDrawColor(180, 130, 100);
+  doc.setLineWidth(0.3);
+  doc.line(mL, 282, mR, 282);
+  doc.setTextColor(160, 120, 90);
+  doc.setFontSize(7.5);
+  doc.text('Casa do Dormente  |  Dormentes de Madeira de Qualidade', 105, 287, { align: 'center' });
 
   const nomeArq = numero + '_' + (orc.cliente || 'cliente').replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '') + '.pdf';
   doc.save(nomeArq);
