@@ -253,7 +253,7 @@
       <div class="field"><label>Nome / Empresa</label><input type="text" id="f-nome" placeholder="Ex: João Silva"></div>
       <div class="g2">
         <div class="field"><label>Telefone</label><input type="tel" id="f-tel" placeholder="(19) 99999-9999"></div>
-        <div class="field"><label>Data</label><input type="date" id="f-data"></div>
+        <div class="field"><label>Emissão</label><input type="date" id="f-data"></div>
       </div>
       <div class="g2">
         <div class="field"><label>Validade do orçamento</label><input type="date" id="f-validade"></div>
@@ -310,7 +310,10 @@
 
     <!-- RESUMO -->
     <div class="form-sec">
-      <div class="form-sec-title"><span class="num-tag">5</span> Resumo</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div class="form-sec-title" style="margin-bottom:0"><span class="num-tag">5</span> Resumo</div>
+        <button onclick="limparItens()" style="background:none;border:1px solid #f5c6c2;color:#c0392b;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer">🗑 Limpar itens</button>
+      </div>
       <table class="resumo-table" id="resumo-table">
         <tr class="muted"><td colspan="2">Nenhum item adicionado</td></tr>
       </table>
@@ -610,6 +613,16 @@ function coletarDados() {
 }
 
 // ─── ITEMS ───────────────────────────────────────────────
+function limparItens() {
+  if (itemAtual.length === 0) return;
+  if (confirm('Remover todos os itens?')) {
+    itemAtual = [];
+    itemCounter = 0;
+    renderItems();
+    calcResumo();
+  }
+}
+
 function addItem() {
   itemCounter++;
   itemAtual.push({ id: itemCounter, classe: 'A', comprimento: '', qtd: 1, valor: '' });
@@ -788,7 +801,7 @@ function _gerarPDFDados(orc, numero) {
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.text(numero, mL, 32);
-  doc.text('Data: ' + fmtData(orc.data) + '   Validade: ' + (fmtData(orc.validade) || '—'), mR, 32, { align: 'right' });
+  doc.text('Emissão: ' + fmtData(orc.data) + '   Validade: ' + (fmtData(orc.validade) || '—'), mR, 32, { align: 'right' });
 
   y = 44;
   doc.setTextColor(74, 36, 16);
@@ -922,8 +935,95 @@ function _gerarPDFDados(orc, numero) {
     doc.text(linhas, mL, y);
   }
 
-  doc.setTextColor(160, 160, 160);
-  doc.setFontSize(7.5);
+  // ── DIAGRAMA MEDIDAS ─────────────────────────────────
+  const dy = y + 6;
+  if (dy < 255) {
+    // Título
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(74, 36, 16);
+    doc.text('MEDIDAS DO DORMENTE', 105, dy, { align: 'center' });
+
+    // Fundo textura madeira (linhas de veio)
+    const bx1 = mL, bx2 = mL + 90, by = dy + 4, bh = 22, bw = 90;
+    // Vista lateral (retângulo largo)
+    doc.setFillColor(210, 170, 120);
+    doc.rect(bx1, by, bw, bh, 'F');
+    // veios madeira vista lateral
+    doc.setDrawColor(185, 140, 90);
+    doc.setLineWidth(0.3);
+    for (let vx = bx1 + 8; vx < bx1 + bw - 4; vx += 9) {
+      doc.line(vx, by + 1, vx + 3, by + bh - 1);
+    }
+    // borda
+    doc.setDrawColor(120, 70, 30);
+    doc.setLineWidth(0.5);
+    doc.rect(bx1, by, bw, bh, 'S');
+    // Labels vista lateral
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(60, 25, 5);
+    doc.text('A', bx1 - 5, by + bh / 2 + 1);
+    doc.text('C', bx1 + bw / 2, by + bh + 5, { align: 'center' });
+    // setas lateral
+    doc.setDrawColor(60, 25, 5);
+    doc.setLineWidth(0.3);
+    // seta altura
+    doc.line(bx1 - 3, by + 2, bx1 - 3, by + bh - 2);
+    doc.line(bx1 - 3, by + 2, bx1 - 5, by + 4);
+    doc.line(bx1 - 3, by + 2, bx1 - 1, by + 4);
+    doc.line(bx1 - 3, by + bh - 2, bx1 - 5, by + bh - 4);
+    doc.line(bx1 - 3, by + bh - 2, bx1 - 1, by + bh - 4);
+    // seta comprimento
+    doc.line(bx1 + 2, by + bh + 3, bx1 + bw - 2, by + bh + 3);
+    doc.line(bx1 + 2, by + bh + 3, bx1 + 4, by + bh + 1);
+    doc.line(bx1 + 2, by + bh + 3, bx1 + 4, by + bh + 5);
+    doc.line(bx1 + bw - 2, by + bh + 3, bx1 + bw - 4, by + bh + 1);
+    doc.line(bx1 + bw - 2, by + bh + 3, bx1 + bw - 4, by + bh + 5);
+
+    // Vista frontal (retângulo menor - seção transversal)
+    const fx = mL + 100, fw = 28, fh = 22;
+    doc.setFillColor(190, 145, 95);
+    doc.rect(fx, by, fw, fh, 'F');
+    // veios madeira vista frontal
+    doc.setDrawColor(165, 118, 68);
+    doc.setLineWidth(0.3);
+    for (let vy = by + 4; vy < by + fh - 2; vy += 5) {
+      doc.line(fx + 2, vy, fx + fw - 2, vy + 1);
+    }
+    // borda
+    doc.setDrawColor(120, 70, 30);
+    doc.setLineWidth(0.5);
+    doc.rect(fx, by, fw, fh, 'S');
+    // Labels vista frontal
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(60, 25, 5);
+    doc.text('A', fx + fw + 3, by + fh / 2 + 1);
+    doc.text('L', fx + fw / 2, by + fh + 5, { align: 'center' });
+    // seta altura frontal
+    doc.setDrawColor(60, 25, 5);
+    doc.setLineWidth(0.3);
+    doc.line(fx + fw + 2, by + 2, fx + fw + 2, by + fh - 2);
+    doc.line(fx + fw + 2, by + 2, fx + fw, by + 4);
+    doc.line(fx + fw + 2, by + 2, fx + fw + 4, by + 4);
+    doc.line(fx + fw + 2, by + fh - 2, fx + fw, by + fh - 4);
+    doc.line(fx + fw + 2, by + fh - 2, fx + fw + 4, by + fh - 4);
+    // seta largura frontal
+    doc.line(fx + 2, by + fh + 3, fx + fw - 2, by + fh + 3);
+    doc.line(fx + 2, by + fh + 3, fx + 4, by + fh + 1);
+    doc.line(fx + 2, by + fh + 3, fx + 4, by + fh + 5);
+    doc.line(fx + fw - 2, by + fh + 3, fx + fw - 4, by + fh + 1);
+    doc.line(fx + fw - 2, by + fh + 3, fx + fw - 4, by + fh + 5);
+
+    // Nota sem escala
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(6);
+    doc.setTextColor(140, 100, 70);
+    doc.text('* Desenho sem escala — apenas ilustrativo', 105, by + fh + 12, { align: 'center' });
+  }
+
+  // ── RODAPÉ ───────────────────────────────────────────
   doc.setDrawColor(180, 130, 100);
   doc.setLineWidth(0.3);
   doc.line(mL, 282, mR, 282);
