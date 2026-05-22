@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Orçamentos — Casa do Dormente</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --verde: #2a6b2a;
+    --verde-escuro: #1e4f1e;
+    --verde-claro: #e8f5e9;
+    --verde-medio: #c8e6c9;
+    --texto: #1a1a1a;
+    --texto-sec: #555;
+    --borda: #d4d4d4;
+    --bg: #f5f5f0;
+    --branco: #ffffff;
+    --danger: #c0392b;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--texto); min-height: 100vh; }
+
+  /* HEADER */
+  .app-header {
+    background: var(--verde-escuro);
+    color: #fff;
+    padding: 14px 16px 12px;
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .app-header h1 { font-size: 17px; font-weight: 600; letter-spacing: 0.3px; }
+  .app-header span { font-size: 11px; opacity: 0.7; display: block; margin-top: 1px; }
+  .header-btn {
+    background: rgba(255,255,255,0.15);
+    border: none; color: #fff; border-radius: var(--radius-sm);
+    padding: 7px 12px; font-size: 13px; cursor: pointer; font-weight: 500;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .header-btn:active { opacity: 0.8; }
+
+  /* VIEWS */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* LISTA DE ORÇAMENTOS */
+  .lista-wrap { padding: 16px; }
+  .lista-empty { text-align: center; padding: 48px 16px; color: var(--texto-sec); font-size: 15px; }
+  .lista-empty svg { display: block; margin: 0 auto 12px; opacity: 0.25; }
+
+  .orc-card {
+    background: var(--branco);
+    border-radius: var(--radius);
+    border: 1px solid var(--borda);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .orc-card:active { border-color: var(--verde); background: var(--verde-claro); }
+  .orc-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .orc-num { font-size: 11px; font-weight: 700; color: var(--verde); letter-spacing: 1px; text-transform: uppercase; }
+  .orc-total { font-size: 16px; font-weight: 700; color: var(--verde-escuro); }
+  .orc-nome { font-size: 15px; font-weight: 600; margin: 4px 0 2px; }
+  .orc-meta { font-size: 12px; color: var(--texto-sec); }
+  .orc-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .btn-sm {
+    flex: 1; padding: 8px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--borda);
+    background: var(--branco); color: var(--texto); text-align: center;
+  }
+  .btn-sm:active { opacity: 0.7; }
+  .btn-sm.danger { color: var(--danger); border-color: #f5c6c2; }
+  .btn-sm.primary { background: var(--verde); color: #fff; border-color: var(--verde); }
+
+  .fab {
+    position: fixed; bottom: 24px; right: 20px;
+    background: var(--verde); color: #fff;
+    border: none; border-radius: 28px;
+    padding: 14px 22px; font-size: 15px; font-weight: 600;
+    box-shadow: 0 4px 16px rgba(42,107,42,0.35);
+    cursor: pointer; display: flex; align-items: center; gap: 8px;
+    z-index: 90;
+  }
+  .fab:active { transform: scale(0.97); }
+
+  /* FORMULÁRIO */
+  .form-wrap { padding: 16px; padding-bottom: 40px; }
+  .form-sec {
+    background: var(--branco);
+    border-radius: var(--radius);
+    border: 1px solid var(--borda);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .form-sec-title {
+    font-size: 13px; font-weight: 700; color: var(--verde-escuro);
+    text-transform: uppercase; letter-spacing: 0.8px;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+  }
+  .form-sec-title .num-tag {
+    background: var(--verde); color: #fff;
+    border-radius: 50%; width: 20px; height: 20px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; flex-shrink: 0;
+  }
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+  label { font-size: 12px; color: var(--texto-sec); display: block; margin-bottom: 4px; font-weight: 500; }
+  input[type=text], input[type=tel], input[type=date], input[type=number], select, textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--borda);
+    border-radius: var(--radius-sm); font-size: 15px; color: var(--texto);
+    background: var(--branco); -webkit-appearance: none; appearance: none;
+    font-family: inherit;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--verde); }
+  textarea { resize: vertical; min-height: 72px; }
+  .g2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+  .g3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+
+  /* ITEM DORMENTE */
+  .item-card {
+    border: 1px solid var(--borda); border-radius: var(--radius-sm);
+    padding: 12px; margin-bottom: 8px; background: #fafaf8;
+  }
+  .item-hdr {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+  }
+  .item-label { font-size: 13px; font-weight: 600; color: var(--texto-sec); }
+  .badge {
+    font-size: 11px; font-weight: 700; padding: 2px 10px;
+    border-radius: 20px; letter-spacing: 0.5px;
+  }
+  .badge-A { background: #c8e6c9; color: #1b5e20; }
+  .badge-B { background: #bbdefb; color: #0d47a1; }
+  .badge-C { background: #fff3e0; color: #e65100; }
+  .rmv-btn {
+    background: none; border: none; cursor: pointer;
+    color: #bbb; font-size: 20px; line-height: 1; padding: 0 2px;
+  }
+  .rmv-btn:active { color: var(--danger); }
+
+  .add-item-btn {
+    width: 100%; background: none; border: 1px dashed var(--borda);
+    border-radius: var(--radius-sm); padding: 11px;
+    color: var(--texto-sec); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    margin-bottom: 4px;
+  }
+  .add-item-btn:active { background: var(--verde-claro); }
+
+  /* RESUMO */
+  .resumo-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .resumo-table td { padding: 6px 0; }
+  .resumo-table td:last-child { text-align: right; font-weight: 600; }
+  .resumo-table .muted td { color: var(--texto-sec); }
+  .resumo-table .muted td:last-child { font-weight: 500; }
+  .resumo-sep td { border-top: 1px solid var(--borda); padding-top: 10px; }
+  .resumo-total td { font-size: 17px; font-weight: 700; color: var(--verde-escuro); }
+
+  /* BOTÕES DE AÇÃO FORMULÁRIO */
+  .form-actions { display: flex; gap: 10px; margin-top: 4px; }
+  .btn-salvar {
+    flex: 1; background: var(--verde); color: #fff;
+    border: none; border-radius: var(--radius-sm);
+    padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  .btn-salvar:active { background: var(--verde-escuro); }
+  .btn-pdf {
+    flex: 1; background: var(--branco); color: var(--texto);
+    border: 1px solid var(--borda); border-radius: var(--radius-sm);
+    padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  .btn-pdf:active { background: var(--verde-claro); }
+
+  /* NÚMERO DO ORC */
+  .orc-numero-display {
+    font-size: 12px; font-weight: 700; color: var(--verde);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px;
+  }
+
+  /* CONFIRM MODAL */
+  .modal-bg {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--branco); border-radius: var(--radius);
+    padding: 24px 20px; width: calc(100% - 40px); max-width: 340px;
+  }
+  .modal h3 { font-size: 16px; margin-bottom: 8px; }
+  .modal p { font-size: 14px; color: var(--texto-sec); margin-bottom: 20px; }
+  .modal-btns { display: flex; gap: 10px; }
+  .modal-btns button {
+    flex: 1; padding: 12px; border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid var(--borda);
+  }
+  .modal-btns .confirm-del { background: var(--danger); color: #fff; border-color: var(--danger); }
+  .modal-btns .cancel { background: var(--branco); color: var(--texto); }
+
+
+  .status-badge {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px;
+  }
+  .status-pendente  { background: #fff3e0; color: #e65100; }
+  .status-aprovado  { background: #c8e6c9; color: #1b5e20; }
+  .status-recusado  { background: #ffcdd2; color: #b71c1c; }
+  .status-expirado  { background: #eeeeee; color: #616161; }
+  .orc-card-status  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .dim-note { font-size: 11px; color: var(--texto-sec); margin-left: 6px; font-weight: 400; letter-spacing: 0; text-transform: none; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header" id="app-header">
+  <div>
+    <h1>Casa do Dormente</h1>
+    <span id="header-sub">Orçamentos</span>
+  </div>
+  <button class="header-btn" id="header-action-btn" onclick="novoOrcamento()">+ Novo</button>
+</div>
+
+<!-- VIEW: LISTA -->
+<div class="view active" id="view-lista">
+  <div class="lista-wrap">
+    <div id="lista-content"></div>
+  </div>
+  <button class="fab" onclick="novoOrcamento()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Novo Orçamento
+  </button>
+</div>
+
+<!-- VIEW: FORMULÁRIO -->
+<div class="view" id="view-form">
+  <div class="form-wrap">
+
+    <div class="orc-numero-display" id="form-numero">ORC-001</div>
+
+    <!-- CLIENTE -->
+    <div class="form-sec">
+      <div class="form-sec-title"><span class="num-tag">1</span> Cliente</div>
+      <div class="field"><label>Nome / Empresa</label><input type="text" id="f-nome" placeholder="Ex: João Silva"></div>
+      <div class="g2">
+        <div class="field"><label>Telefone</label><input type="tel" id="f-tel" placeholder="(19) 99999-9999"></div>
+        <div class="field"><label>Data</label><input type="date" id="f-data"></div>
+      </div>
+      <div class="g2">
+        <div class="field"><label>Validade do orçamento</label><input type="date" id="f-validade"></div>
+        <div class="field">
+          <label>Status</label>
+          <select id="f-status">
+            <option value="pendente">Pendente</option>
+            <option value="aprovado">Aprovado</option>
+            <option value="recusado">Recusado</option>
+            <option value="expirado">Expirado</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Endereço / Cidade</label><input type="text" id="f-end" placeholder="Cidade ou endereço de entrega"></div>
+    </div>
+
+    <!-- DORMENTES -->
+    <div class="form-sec">
+      <div class="form-sec-title">
+        <span class="num-tag">2</span> Dormentes
+        <span class="dim-note">Padrão: 24 × 17 cm</span>
+      </div>
+      <div id="items-list"></div>
+      <button class="add-item-btn" onclick="addItem()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Adicionar dormente
+      </button>
+    </div>
+
+    <!-- CORTES -->
+    <div class="form-sec">
+      <div class="form-sec-title"><span class="num-tag">3</span> Cortes</div>
+      <div class="g2">
+        <div class="field"><label>Qtd de cortes</label><input type="number" id="f-qtd-cortes" min="0" value="0" oninput="calcResumo()"></div>
+        <div class="field"><label>Valor por corte (R$)</label><input type="number" id="f-val-corte" min="0" step="0.01" value="20" oninput="calcResumo()"></div>
+      </div>
+    </div>
+
+    <!-- FRETE -->
+    <div class="form-sec">
+      <div class="form-sec-title"><span class="num-tag">4</span> Frete</div>
+      <div class="field">
+        <label>Modalidade</label>
+        <select id="f-frete-tipo" onchange="toggleFrete()">
+          <option value="retira">Retirada no local — sem custo</option>
+          <option value="entrega">Frete entrega</option>
+          <option value="terceiro">Frete terceiro (pagamento direto para terceiro)</option>
+        </select>
+      </div>
+      <div id="f-frete-campo" style="display:none">
+        <div class="field"><label id="f-frete-label">Valor do frete (R$)</label><input type="number" id="f-val-frete" min="0" step="0.01" value="0" oninput="calcResumo()"></div>
+      </div>
+    </div>
+
+    <!-- RESUMO -->
+    <div class="form-sec">
+      <div class="form-sec-title"><span class="num-tag">5</span> Resumo</div>
+      <table class="resumo-table" id="resumo-table">
+        <tr class="muted"><td colspan="2">Nenhum item adicionado</td></tr>
+      </table>
+    </div>
+
+    <!-- OBSERVAÇÕES -->
+    <div class="form-sec">
+      <div class="form-sec-title"><span class="num-tag">6</span> Observações</div>
+      <div class="field">
+        <textarea id="f-obs" placeholder="Condições de pagamento, prazo de validade, outros..."></textarea>
+      </div>
+    </div>
+
+    <!-- AÇÕES -->
+    <div class="form-actions">
+      <button class="btn-pdf" onclick="gerarPDF()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Gerar PDF
+      </button>
+      <button class="btn-salvar" onclick="salvarOrcamento()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-3px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>
+        Salvar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR EXCLUSÃO -->
+<div class="modal-bg" id="modal-del">
+  <div class="modal">
+    <h3>Excluir orçamento?</h3>
+    <p>Esta ação não pode ser desfeita.</p>
+    <div class="modal-btns">
+      <button class="cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="confirm-del" onclick="confirmarExclusao()">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────
+let orcamentos = JSON.parse(localStorage.getItem('cd_orcamentos') || '[]');
+let proximoNum = parseInt(localStorage.getItem('cd_proximo_num') || '1');
+let itemCounter = 0;
+let itemAtual = [];
+let editandoId = null;
+let deletandoId = null;
+
+// ─── UTILS ───────────────────────────────────────────────
+function salvarStorage() {
+  localStorage.setItem('cd_orcamentos', JSON.stringify(orcamentos));
+  localStorage.setItem('cd_proximo_num', String(proximoNum));
+}
+
+function fmtNum(n) {
+  return 'ORC-' + String(n).padStart(3, '0');
+}
+
+function fmtMoeda(v) {
+  return 'R$ ' + parseFloat(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtData(s) {
+  if (!s) return '—';
+  const d = new Date(s + 'T12:00:00');
+  return d.toLocaleDateString('pt-BR');
+}
+
+function calcTotalOrc(orc) {
+  let sub = 0;
+  (orc.items || []).forEach(i => { sub += (parseInt(i.qtd) || 1) * (parseFloat(i.valor) || 0); });
+  const cortes = (parseInt(orc.qtdCortes) || 0) * (parseFloat(orc.valCorte) || 0);
+  const frete = orc.freteTipo === 'fixo' ? (parseFloat(orc.valFrete) || 0) : 0;
+  return sub + cortes + frete;
+}
+
+// ─── NAVEGAÇÃO ───────────────────────────────────────────
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+
+  const subEl = document.getElementById('header-sub');
+  const btnEl = document.getElementById('header-action-btn');
+
+  if (v === 'lista') {
+    subEl.textContent = 'Orçamentos';
+    btnEl.textContent = '+ Novo';
+    btnEl.onclick = novoOrcamento;
+    renderLista();
+  } else {
+    subEl.textContent = editandoId ? 'Editando' : 'Novo orçamento';
+    btnEl.textContent = '← Voltar';
+    btnEl.onclick = voltarLista;
+  }
+}
+
+function voltarLista() {
+  editandoId = null;
+  showView('lista');
+}
+
+// ─── STATUS ──────────────────────────────────────────────
+function statusEfetivo(orc) {
+  if (orc.status === 'aprovado' || orc.status === 'recusado') return orc.status;
+  if (orc.validade) {
+    const val = new Date(orc.validade + 'T23:59:59');
+    if (val < new Date()) return 'expirado';
+  }
+  return orc.status || 'pendente';
+}
+
+function labelStatus(s) {
+  return { pendente: 'Pendente', aprovado: 'Aprovado', recusado: 'Recusado', expirado: 'Expirado' }[s] || s;
+}
+
+// ─── LISTA ───────────────────────────────────────────────
+function renderLista() {
+  const el = document.getElementById('lista-content');
+  if (orcamentos.length === 0) {
+    el.innerHTML = `
+      <div class="lista-empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+        </svg>
+        Nenhum orçamento ainda.<br>Toque em <strong>+ Novo</strong> para começar.
+      </div>`;
+    return;
+  }
+  const sorted = [...orcamentos].sort((a, b) => b.numero - a.numero);
+  el.innerHTML = sorted.map(orc => {
+    const total = calcTotalOrc(orc);
+    const nItens = (orc.items || []).length;
+    return `
+      <div class="orc-card" onclick="editarOrcamento(${orc.id})">
+        <div class="orc-card-top">
+          <span class="orc-num">${fmtNum(orc.numero)}</span>
+          <span class="orc-total">${fmtMoeda(total)}</span>
+        </div>
+        <div class="orc-card-status">
+          <div class="orc-nome">${orc.cliente || 'Cliente não informado'}</div>
+          <span class="status-badge status-${statusEfetivo(orc)}">${labelStatus(statusEfetivo(orc))}</span>
+        </div>
+        <div class="orc-meta">${fmtData(orc.data)} · Validade: ${fmtData(orc.validade) || '—'} · ${nItens} dormente${nItens !== 1 ? 's' : ''}</div>
+        <div class="orc-actions" onclick="event.stopPropagation()">
+          <button class="btn-sm" onclick="editarOrcamento(${orc.id})">✏️ Editar</button>
+          <button class="btn-sm primary" onclick="gerarPDFById(${orc.id})">📄 PDF</button>
+          <button class="btn-sm danger" onclick="pedirExclusao(${orc.id})">🗑 Excluir</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ─── FORMULÁRIO ──────────────────────────────────────────
+function novoOrcamento() {
+  editandoId = null;
+  itemAtual = [];
+  itemCounter = 0;
+
+  document.getElementById('f-nome').value = '';
+  document.getElementById('f-tel').value = '';
+  document.getElementById('f-end').value = '';
+  document.getElementById('f-obs').value = '';
+  document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
+  document.getElementById('f-validade').value = '';
+  document.getElementById('f-status').value = 'pendente';
+  document.getElementById('f-qtd-cortes').value = '0';
+  document.getElementById('f-val-corte').value = '20';
+  document.getElementById('f-frete-tipo').value = 'retira';
+  document.getElementById('f-frete-campo').style.display = 'none';
+  document.getElementById('form-numero').textContent = fmtNum(proximoNum);
+
+  renderItems();
+  calcResumo();
+  showView('form');
+  window.scrollTo(0, 0);
+}
+
+function editarOrcamento(id) {
+  const orc = orcamentos.find(o => o.id === id);
+  if (!orc) return;
+  editandoId = id;
+  itemAtual = JSON.parse(JSON.stringify(orc.items || []));
+  itemCounter = itemAtual.length ? Math.max(...itemAtual.map(i => i.id)) : 0;
+
+  document.getElementById('f-nome').value = orc.cliente || '';
+  document.getElementById('f-tel').value = orc.telefone || '';
+  document.getElementById('f-end').value = orc.cidade || '';
+  document.getElementById('f-data').value = orc.data || '';
+  document.getElementById('f-obs').value = orc.obs || '';
+  document.getElementById('f-validade').value = orc.validade || '';
+  document.getElementById('f-status').value = orc.status || 'pendente';
+  document.getElementById('f-qtd-cortes').value = orc.qtdCortes || '0';
+  document.getElementById('f-val-corte').value = orc.valCorte || '20';
+  document.getElementById('f-frete-tipo').value = orc.freteTipo || 'retira';
+  toggleFrete();
+  document.getElementById('form-numero').textContent = fmtNum(orc.numero);
+
+  if (orc.freteTipo === 'entrega' || orc.freteTipo === 'terceiro') document.getElementById('f-val-frete').value = orc.valFrete || '0';
+
+  renderItems();
+  calcResumo();
+  showView('form');
+  window.scrollTo(0, 0);
+}
+
+function salvarOrcamento() {
+  const dados = coletarDados();
+  if (editandoId) {
+    const idx = orcamentos.findIndex(o => o.id === editandoId);
+    if (idx !== -1) orcamentos[idx] = { ...orcamentos[idx], ...dados };
+  } else {
+    orcamentos.push({ id: Date.now(), numero: proximoNum, ...dados });
+    proximoNum++;
+  }
+  salvarStorage();
+  voltarLista();
+}
+
+function coletarDados() {
+  return {
+    cliente: document.getElementById('f-nome').value.trim(),
+    telefone: document.getElementById('f-tel').value.trim(),
+    cidade: document.getElementById('f-end').value.trim(),
+    data: document.getElementById('f-data').value,
+    obs: document.getElementById('f-obs').value.trim(),
+    validade: document.getElementById('f-validade').value,
+    status: document.getElementById('f-status').value,
+    items: JSON.parse(JSON.stringify(itemAtual)),
+    qtdCortes: document.getElementById('f-qtd-cortes').value,
+    valCorte: document.getElementById('f-val-corte').value,
+    freteTipo: document.getElementById('f-frete-tipo').value,
+    valFrete: document.getElementById('f-val-frete')?.value || '0',
+  };
+}
+
+// ─── ITEMS ───────────────────────────────────────────────
+function addItem() {
+  itemCounter++;
+  itemAtual.push({ id: itemCounter, classe: 'A', comprimento: '', qtd: 1, valor: '' });
+  renderItems();
+  calcResumo();
+}
+
+function removeItem(id) {
+  itemAtual = itemAtual.filter(i => i.id !== id);
+  renderItems();
+  calcResumo();
+}
+
+function updateItem(id, field, val) {
+  const item = itemAtual.find(i => i.id === id);
+  if (!item) return;
+  item[field] = val;
+  if (field === 'classe') {
+    const badge = document.getElementById('badge-' + id);
+    if (badge) { badge.textContent = 'Classe ' + val; badge.className = 'badge badge-' + val; }
+  }
+  calcResumo();
+}
+
+function renderItems() {
+  const el = document.getElementById('items-list');
+  if (itemAtual.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:16px;color:#aaa;font-size:14px">Nenhum dormente adicionado</div>';
+    return;
+  }
+  el.innerHTML = itemAtual.map((item, idx) => `
+    <div class="item-card">
+      <div class="item-hdr">
+        <span class="item-label">Item ${idx + 1}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="badge badge-${item.classe}" id="badge-${item.id}">Classe ${item.classe}</span>
+          <button class="rmv-btn" onclick="removeItem(${item.id})">×</button>
+        </div>
+      </div>
+      <div class="g3">
+        <div class="field">
+          <label>Classe</label>
+          <select onchange="updateItem(${item.id},'classe',this.value)">
+            <option value="A" ${item.classe === 'A' ? 'selected' : ''}>A</option>
+            <option value="B" ${item.classe === 'B' ? 'selected' : ''}>B</option>
+            <option value="C" ${item.classe === 'C' ? 'selected' : ''}>C</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Comp. (cm)</label>
+          <input type="number" min="1" placeholder="Ex: 200" value="${item.comprimento}"
+            oninput="updateItem(${item.id},'comprimento',this.value)">
+        </div>
+        <div class="field">
+          <label>Qtd (un)</label>
+          <input type="number" min="1" value="${item.qtd}"
+            oninput="updateItem(${item.id},'qtd',parseInt(this.value)||1)">
+        </div>
+      </div>
+      <div class="field">
+        <label>Valor unitário (R$)</label>
+        <input type="number" min="0" step="0.01" placeholder="0,00" value="${item.valor}"
+          oninput="updateItem(${item.id},'valor',this.value)">
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── RESUMO ───────────────────────────────────────────────
+function toggleFrete() {
+  const tipo = document.getElementById('f-frete-tipo').value;
+  const mostrar = tipo === 'entrega' || tipo === 'terceiro';
+  document.getElementById('f-frete-campo').style.display = mostrar ? 'block' : 'none';
+  const lbl = document.getElementById('f-frete-label');
+  if (lbl) lbl.textContent = tipo === 'terceiro' ? 'Valor do frete (pago direto ao terceiro — R$)' : 'Valor do frete (R$)';
+  calcResumo();
+}
+
+function calcResumo() {
+  const table = document.getElementById('resumo-table');
+  if (itemAtual.length === 0) {
+    table.innerHTML = '<tr class="muted"><td colspan="2">Nenhum item adicionado</td></tr>';
+    return;
+  }
+  let subtotal = 0;
+  const linhas = itemAtual.map((item, idx) => {
+    const qtd = parseInt(item.qtd) || 1;
+    const val = parseFloat(item.valor) || 0;
+    const tot = qtd * val;
+    subtotal += tot;
+    const comp = item.comprimento ? item.comprimento + ' cm' : '—';
+    return `<tr class="muted"><td>Item ${idx+1} · Cl.${item.classe} · ${comp} · ${qtd}un</td><td>${fmtMoeda(tot)}</td></tr>`;
+  }).join('');
+
+  const qtdC = parseInt(document.getElementById('f-qtd-cortes').value) || 0;
+  const valC = parseFloat(document.getElementById('f-val-corte').value) || 0;
+  const totalCortes = qtdC * valC;
+  const tipoFrete = document.getElementById('f-frete-tipo').value;
+  let totalFrete = 0;
+  let freteLabel = 'Frete';
+  let freteValor = '—';
+  if (tipoFrete === 'entrega') {
+    totalFrete = parseFloat(document.getElementById('f-val-frete').value) || 0;
+    freteValor = fmtMoeda(totalFrete);
+    freteLabel = 'Frete entrega';
+  } else if (tipoFrete === 'terceiro') {
+    totalFrete = 0;
+    freteValor = 'Pago direto ao terceiro';
+    freteLabel = 'Frete terceiro';
+  } else {
+    freteLabel = 'Frete';
+    freteValor = 'Retirada no local';
+  }
+  const total = subtotal + totalCortes + totalFrete;
+
+  table.innerHTML = `
+    ${linhas}
+    <tr class="resumo-sep muted"><td>Subtotal dormentes</td><td>${fmtMoeda(subtotal)}</td></tr>
+    ${qtdC > 0 ? `<tr class="muted"><td>Cortes (${qtdC}×)</td><td>${fmtMoeda(totalCortes)}</td></tr>` : ''}
+    <tr class="muted"><td>${freteLabel}</td><td>${freteValor}</td></tr>
+    <tr class="resumo-sep resumo-total"><td>Total</td><td>${fmtMoeda(total)}</td></tr>
+  `;
+}
+
+// ─── EXCLUSÃO ─────────────────────────────────────────────
+function pedirExclusao(id) {
+  deletandoId = id;
+  document.getElementById('modal-del').classList.add('open');
+}
+function fecharModal() {
+  deletandoId = null;
+  document.getElementById('modal-del').classList.remove('open');
+}
+function confirmarExclusao() {
+  orcamentos = orcamentos.filter(o => o.id !== deletandoId);
+  salvarStorage();
+  fecharModal();
+  renderLista();
+}
+
+// ─── PDF ──────────────────────────────────────────────────
+function gerarPDF() {
+  const dados = coletarDados();
+  const numero = editandoId
+    ? fmtNum(orcamentos.find(o => o.id === editandoId)?.numero || proximoNum)
+    : fmtNum(proximoNum);
+  _gerarPDFDados(dados, numero);
+}
+
+function gerarPDFById(id) {
+  const orc = orcamentos.find(o => o.id === id);
+  if (!orc) return;
+  _gerarPDFDados(orc, fmtNum(orc.numero));
+}
+
+function _gerarPDFDados(orc, numero) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const mL = 18, mR = 192;
+  let y = 0;
+
+  // Cabeçalho verde
+  doc.setFillColor(30, 79, 30);
+  doc.rect(0, 0, 210, 18, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(13);
+  doc.setFont('helvetica', 'bold');
+  doc.text('CASA DO DORMENTE', mL, 10);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Dormentes de Madeira', mL, 15);
+  doc.setFontSize(9);
+  doc.text(numero, mR, 10, { align: 'right' });
+  doc.text('Data: ' + fmtData(orc.data) + '   Validade: ' + (fmtData(orc.validade) || '—'), mR, 15, { align: 'right' });
+
+  y = 28;
+  doc.setTextColor(30, 79, 30);
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('ORÇAMENTO', mL, y);
+
+  y += 8;
+  doc.setDrawColor(200, 230, 200);
+  doc.setLineWidth(0.3);
+  doc.line(mL, y, mR, y);
+
+  y += 7;
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(80, 80, 80);
+  doc.text('CLIENTE', mL, y);
+  y += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(30, 30, 30);
+  doc.text('Nome: ' + (orc.cliente || '—'), mL, y);
+  doc.text('Tel: ' + (orc.telefone || '—'), 110, y);
+  y += 5;
+  doc.text('Endereço: ' + (orc.cidade || '—'), mL, y);
+  doc.text('Status: ' + labelStatus(statusEfetivo(orc)), 140, y);
+
+  y += 8;
+  doc.setDrawColor(200, 230, 200);
+  doc.line(mL, y, mR, y);
+
+  y += 7;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.setTextColor(80, 80, 80);
+  doc.text('DORMENTES  |  Dimensão padrão: Largura 24 cm × Altura 17 cm', mL, y);
+
+  y += 6;
+  // Cabeçalho tabela
+  doc.setFillColor(30, 79, 30);
+  doc.rect(mL, y - 4.5, mR - mL, 7, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  const cols = [mL+2, mL+16, mL+32, mL+80, mL+102, mR-2];
+  const headers = ['#', 'Classe', 'Dimensões (cm)', 'Qtd', 'Valor Un.', 'Total'];
+  const aligns = ['left','left','left','left','left','right'];
+  headers.forEach((h, i) => doc.text(h, cols[i], y, { align: aligns[i] }));
+  y += 5;
+
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('helvetica', 'normal');
+  let subtotal = 0;
+  (orc.items || []).forEach((item, idx) => {
+    const qtd = parseInt(item.qtd) || 1;
+    const val = parseFloat(item.valor) || 0;
+    const tot = qtd * val;
+    subtotal += tot;
+    const comp = item.comprimento ? item.comprimento : '—';
+    const dims = `24 × 17 × ${comp}`;
+    if (idx % 2 === 0) { doc.setFillColor(242, 250, 242); doc.rect(mL, y - 4.5, mR - mL, 7, 'F'); }
+    const row = [String(idx+1), item.classe, dims, String(qtd), fmtMoeda(val), fmtMoeda(tot)];
+    row.forEach((v, i) => doc.text(v, cols[i], y, { align: aligns[i] }));
+    y += 7;
+    if (y > 255) { doc.addPage(); y = 20; }
+  });
+
+  y += 4;
+  doc.setDrawColor(200, 230, 200);
+  doc.setLineWidth(0.3);
+  doc.line(mL, y, mR, y);
+  y += 6;
+
+  const qtdC = parseInt(orc.qtdCortes) || 0;
+  const valC = parseFloat(orc.valCorte) || 0;
+  const totalCortes = qtdC * valC;
+  const tipoFrete = orc.freteTipo || 'retira';
+  let totalFrete = tipoFrete === 'entrega' ? (parseFloat(orc.valFrete) || 0) : 0;
+  const total = subtotal + totalCortes + totalFrete;
+
+  const addLinha = (label, valor, bold) => {
+    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(80, 80, 80);
+    doc.text(label, mR - 65, y);
+    doc.setTextColor(30, 30, 30);
+    doc.text(valor, mR - 2, y, { align: 'right' });
+    y += 6;
+  };
+
+  addLinha('Subtotal dormentes:', fmtMoeda(subtotal), false);
+  if (qtdC > 0) addLinha(`Cortes (${qtdC}×  R$${parseFloat(valC).toFixed(2)}):`, fmtMoeda(totalCortes), false);
+  const freteLabel = tipoFrete === 'entrega' ? 'Frete entrega:' : (tipoFrete === 'terceiro' ? 'Frete terceiro:' : 'Frete:');
+  const freteValor = tipoFrete === 'entrega' ? fmtMoeda(totalFrete) : (tipoFrete === 'terceiro' ? 'Pago direto ao terceiro' : 'Retirada no local');
+  addLinha(freteLabel, freteValor, false);
+
+  doc.setLineWidth(0.5);
+  doc.setDrawColor(30, 79, 30);
+  doc.line(mR - 67, y - 2, mR, y - 2);
+  y += 3;
+  doc.setFillColor(30, 79, 30);
+  doc.rect(mR - 67, y - 5, 67, 9, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('TOTAL:', mR - 62, y);
+  doc.text(fmtMoeda(total), mR - 2, y, { align: 'right' });
+  y += 12;
+
+  if (orc.obs) {
+    doc.setTextColor(80, 80, 80);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.text('OBSERVAÇÕES:', mL, y); y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(30, 30, 30);
+    const linhas = doc.splitTextToSize(orc.obs, mR - mL);
+    doc.text(linhas, mL, y);
+  }
+
+  doc.setTextColor(160, 160, 160);
+  doc.setFontSize(7.5);
+  doc.text('Casa do Dormente — Dormentes de Madeira de Qualidade', 105, 287, { align: 'center' });
+
+  const nomeArq = numero + '_' + (orc.cliente || 'cliente').replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '') + '.pdf';
+  doc.save(nomeArq);
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+renderLista();
+</script>
+</body>
+</html>
