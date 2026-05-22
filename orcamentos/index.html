@@ -837,16 +837,17 @@ function _gerarPDFDados(orc, numero) {
 
   y += 6;
   // Cabeçalho tabela
+  const rowH = 8;
   doc.setFillColor(74, 36, 16);
-  doc.rect(mL, y - 4.5, mR - mL, 7, 'F');
+  doc.rect(mL, y, mR - mL, rowH, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
   const cols = [mL+2, mL+14, mL+28, mL+85, mL+107, mR-2];
-  const headers = ['Item', 'Classe', 'C x L x A (metros)', 'Qtd', 'Valor Un.', 'Total'];
+  const headers = ['Item', 'Classe', 'C x L x A (metros)', 'Qtd', 'R$ Unidade', 'R$ Total'];
   const aligns = ['left','left','left','left','left','right'];
-  headers.forEach((h, i) => doc.text(h, cols[i], y + 0.5, { align: aligns[i] }));
-  y += 5;
+  headers.forEach((h, i) => doc.text(h, cols[i], y + 5.5, { align: aligns[i] }));
+  y += rowH + 2;
 
   doc.setTextColor(30, 30, 30);
   doc.setFont('helvetica', 'normal');
@@ -860,10 +861,10 @@ function _gerarPDFDados(orc, numero) {
     const larg = item.largura ? parseFloat(item.largura).toFixed(2).replace('.',',') + 'm' : '0,24m';
     const alt  = item.altura  ? parseFloat(item.altura).toFixed(2).replace('.',',')  + 'm' : '0,17m';
     const dims = `${comp} × 0,24m × 0,17m`;
-    if (idx % 2 === 0) { doc.setFillColor(250, 245, 240); doc.rect(mL, y - 4.5, mR - mL, 7, 'F'); }
+    if (idx % 2 === 0) { doc.setFillColor(250, 245, 240); doc.rect(mL, y, mR - mL, rowH, 'F'); }
     const row = [String(idx+1), item.classe, dims, String(qtd), fmtMoeda(val), fmtMoeda(tot)];
-    row.forEach((v, i) => doc.text(v, cols[i], y + 0.5, { align: aligns[i] }));
-    y += 7;
+    row.forEach((v, i) => doc.text(v, cols[i], y + 5.5, { align: aligns[i] }));
+    y += rowH + 1;
     if (y > 255) { doc.addPage(); y = 20; }
   });
 
