@@ -175,6 +175,13 @@
     padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer;
   }
   .btn-pdf:active { background: var(--verde-claro); }
+  .btn-wpp {
+    flex: 1; background: #25D366; color: #fff;
+    border: none; border-radius: var(--radius-sm);
+    padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+  }
+  .btn-wpp:active { background: #1da851; }
 
   /* NÚMERO DO ORC */
   .orc-numero-display {
@@ -331,7 +338,11 @@
     <div class="form-actions">
       <button class="btn-pdf" onclick="gerarPDF()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Gerar PDF
+        PDF
+      </button>
+      <button class="btn-wpp" onclick="enviarWhatsApp()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px;margin-right:4px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.096.543 4.064 1.49 5.775L0 24l6.384-1.473A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.886 0-3.65-.51-5.163-1.4l-.371-.22-3.793.875.906-3.677-.242-.384A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        WhatsApp
       </button>
       <button class="btn-salvar" onclick="salvarOrcamento()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-3px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>
@@ -523,6 +534,7 @@ function renderLista() {
         <div class="orc-actions" onclick="event.stopPropagation()">
           <button class="btn-sm" onclick="editarOrcamento(${orc.id})">✏️ Editar</button>
           <button class="btn-sm primary" onclick="gerarPDFById(${orc.id})">📄 PDF</button>
+          <button class="btn-sm" style="background:#25D366;color:#fff;border-color:#25D366" onclick="enviarWhatsAppById(${orc.id})">💬 WhatsApp</button>
           <button class="btn-sm danger" onclick="pedirExclusao(${orc.id})">🗑 Excluir</button>
         </div>
       </div>`;
@@ -748,6 +760,55 @@ function calcResumo() {
   `;
 }
 
+
+function _montarMensagemWpp(orc, numero) {
+  const total = calcTotalOrc(orc);
+  const dataEmissao = fmtData(orc.data);
+  const validade = fmtData(orc.validade) || '—';
+  let itens = '';
+  (orc.items || []).forEach((item, idx) => {
+    const qtd = parseInt(item.qtd) || 1;
+    const val = parseFloat(item.valor) || 0;
+    const comp = item.comprimento ? parseFloat(item.comprimento).toFixed(2).replace('.',',') + 'm' : '—';
+    itens += `\n  Item ${idx+1}: Classe ${item.classe} | ${comp} × 0,24m × 0,17m | ${qtd}un × ${fmtMoeda(val)} = ${fmtMoeda(qtd*val)}`;
+  });
+  const qtdC = parseInt(orc.qtdCortes)||0;
+  const valC = parseFloat(orc.valCorte)||0;
+  const cortesLinha = qtdC > 0 ? `\n  Cortes: ${qtdC}× = ${fmtMoeda(qtdC*valC)}` : '';
+  const freteLinha = orc.freteTipo === 'entrega' ? `\n  Frete: ${fmtMoeda(parseFloat(orc.valFrete)||0)}` : orc.freteTipo === 'terceiro' ? '\n  Frete: pago direto ao transportador' : '\n  Frete: retirada no local';
+  const msg =
+`*ORÇAMENTO ${numero} — CASA DO DORMENTE*
+━━━━━━━━━━━━━━━━━━━━
+📋 Cliente: ${orc.cliente || '—'}
+📅 Emissão: ${dataEmissao} | Validade: ${validade}
+━━━━━━━━━━━━━━━━━━━━
+*ITENS:*${itens}${cortesLinha}${freteLinha}
+━━━━━━━━━━━━━━━━━━━━
+💰 *TOTAL: ${fmtMoeda(total)}*
+━━━━━━━━━━━━━━━━━━━━
+_Tolerância dimensional: as dimensões podem apresentar variações._
+_O PDF deste orçamento segue em anexo._`;
+  return msg;
+}
+
+function enviarWhatsApp() {
+  const dados = coletarDados();
+  const numero = editandoId
+    ? fmtNum(orcamentos.find(o => o.id === editandoId)?.numero || proximoNum)
+    : fmtNum(proximoNum);
+  const msg = _montarMensagemWpp(dados, numero);
+  const url = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
+}
+
+function enviarWhatsAppById(id) {
+  const orc = orcamentos.find(o => o.id === id);
+  if (!orc) return;
+  const msg = _montarMensagemWpp(orc, fmtNum(orc.numero));
+  const url = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
+}
+
 // ─── EXCLUSÃO ─────────────────────────────────────────────
 function pedirExclusao(id) {
   deletandoId = id;
@@ -935,92 +996,104 @@ function _gerarPDFDados(orc, numero) {
     doc.text(linhas, mL, y);
   }
 
-  // ── DIAGRAMA MEDIDAS ─────────────────────────────────
-  const dy = y + 6;
-  if (dy < 255) {
+  // ── DIAGRAMA DORMENTE ────────────────────────────────
+  const dy = y + 8;
+  if (dy < 240) {
     // Título
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7.5);
     doc.setTextColor(74, 36, 16);
-    doc.text('MEDIDAS DO DORMENTE', 105, dy, { align: 'center' });
+    doc.text('REFERÊNCIA DE MEDIDAS', 105, dy, { align: 'center' });
 
-    // Fundo textura madeira (linhas de veio)
-    const bx1 = mL, bx2 = mL + 90, by = dy + 4, bh = 22, bw = 90;
-    // Vista lateral (retângulo largo)
-    doc.setFillColor(210, 170, 120);
-    doc.rect(bx1, by, bw, bh, 'F');
-    // veios madeira vista lateral
-    doc.setDrawColor(185, 140, 90);
+    const bx = 28; // x inicial
+    const bw = 120; // largura face frontal
+    const bh = 20;  // altura face frontal
+    const dx = 28;  // profundidade perspectiva x
+    const dddy = -18; // profundidade perspectiva y (negativo = sobe)
+    const by2 = dy + 6;
+
+    // Pontos do sólido 3D
+    // Face frontal: (bx,by2) → (bx+bw,by2) → (bx+bw,by2+bh) → (bx,by2+bh)
+    // Face superior: (bx,by2) → (bx+dx,by2+dddy) → (bx+bw+dx,by2+dddy) → (bx+bw,by2)
+    // Face lateral: (bx+bw,by2) → (bx+bw+dx,by2+dddy) → (bx+bw+dx,by2+dddy+bh) → (bx+bw,by2+bh)
+
+    // Face superior
+    doc.setFillColor(200, 145, 58);
+    doc.triangle(bx, by2, bx+dx, by2+dddy, bx+bw+dx, by2+dddy, 'F');
+    doc.triangle(bx, by2, bx+bw, by2, bx+bw+dx, by2+dddy, 'F');
+    // veios topo
+    doc.setDrawColor(176, 120, 48);
     doc.setLineWidth(0.3);
-    for (let vx = bx1 + 8; vx < bx1 + bw - 4; vx += 9) {
-      doc.line(vx, by + 1, vx + 3, by + bh - 1);
+    for (let vx2 = bx+15; vx2 < bx+bw+dx-5; vx2+=14) {
+      const ratio = (vx2-bx)/(bw+dx);
+      doc.line(vx2, by2 + dddy*ratio, vx2+4, by2 + dddy*(ratio+0.03));
     }
-    // borda
-    doc.setDrawColor(120, 70, 30);
+    doc.setDrawColor(122, 78, 26);
     doc.setLineWidth(0.5);
-    doc.rect(bx1, by, bw, bh, 'S');
-    // Labels vista lateral
+    // borda topo
+    doc.lines([[dx,dddy],[bw,0],[-dx,-dddy]], bx, by2, [1,1], 'S');
+
+    // Face frontal
+    doc.setFillColor(160, 104, 48);
+    doc.rect(bx, by2, bw, bh, 'F');
+    // veios frente
+    doc.setDrawColor(138, 85, 32);
+    doc.setLineWidth(0.3);
+    for (let vx2 = bx+18; vx2 < bx+bw-5; vx2+=15) {
+      doc.line(vx2, by2+1, vx2+1, by2+bh-1);
+    }
+    // nó
+    doc.ellipse(bx+35, by2+bh/2, 5, 8, 'S');
+    doc.setDrawColor(122, 78, 26);
+    doc.setLineWidth(0.5);
+    doc.rect(bx, by2, bw, bh, 'S');
+
+    // Face lateral
+    doc.setFillColor(138, 85, 32);
+    doc.lines([[dx,dddy],[0,bh],[-dx,-dddy]], bx+bw, by2, [1,1], 'FD');
+
+    // ── COTAS ──
+    doc.setDrawColor(40, 20, 8);
+    doc.setLineWidth(0.4);
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(40, 20, 8);
+
+    // Comprimento (embaixo)
+    const caY = by2 + bh + 5;
+    doc.line(bx, caY, bx+bw, caY);
+    doc.line(bx, by2+bh+1, bx, caY+1);
+    doc.line(bx+bw, by2+bh+1, bx+bw, caY+1);
+    doc.text('COMPRIMENTO (C)', bx + bw/2, caY + 4, { align: 'center' });
+
+    // Altura (esquerda)
+    const haX = bx - 8;
+    doc.line(haX, by2, haX, by2+bh);
+    doc.line(haX-1, by2, bx-1, by2);
+    doc.line(haX-1, by2+bh, bx-1, by2+bh);
+    doc.text('A', haX - 2, by2 + bh/2 + 2, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.text('0,17m', haX - 2, by2 + bh/2 + 7, { align: 'right' });
+
+    // Largura (diagonal)
+    const lx1 = bx+bw, ly1 = by2, lx2 = bx+bw+dx, ly2 = by2+dddy;
+    doc.line(lx1, ly1, lx2, ly2);
+    doc.line(lx2, ly2, lx2+12, ly2-4);
+    doc.setFont('helvetica', 'bold');
+    doc.text('L 0,24m', lx2+14, ly2-2);
+
+    // Tolerância
+    const tolY = dy + bh + 26;
+    doc.setFillColor(253, 246, 238);
+    doc.setDrawColor(200, 160, 112);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(bx, tolY, 155, 9, 1, 1, 'FD');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(6.5);
-    doc.setTextColor(60, 25, 5);
-    doc.text('A', bx1 - 5, by + bh / 2 + 1);
-    doc.text('C', bx1 + bw / 2, by + bh + 5, { align: 'center' });
-    // setas lateral
-    doc.setDrawColor(60, 25, 5);
-    doc.setLineWidth(0.3);
-    // seta altura
-    doc.line(bx1 - 3, by + 2, bx1 - 3, by + bh - 2);
-    doc.line(bx1 - 3, by + 2, bx1 - 5, by + 4);
-    doc.line(bx1 - 3, by + 2, bx1 - 1, by + 4);
-    doc.line(bx1 - 3, by + bh - 2, bx1 - 5, by + bh - 4);
-    doc.line(bx1 - 3, by + bh - 2, bx1 - 1, by + bh - 4);
-    // seta comprimento
-    doc.line(bx1 + 2, by + bh + 3, bx1 + bw - 2, by + bh + 3);
-    doc.line(bx1 + 2, by + bh + 3, bx1 + 4, by + bh + 1);
-    doc.line(bx1 + 2, by + bh + 3, bx1 + 4, by + bh + 5);
-    doc.line(bx1 + bw - 2, by + bh + 3, bx1 + bw - 4, by + bh + 1);
-    doc.line(bx1 + bw - 2, by + bh + 3, bx1 + bw - 4, by + bh + 5);
-
-    // Vista frontal (retângulo menor - seção transversal)
-    const fx = mL + 100, fw = 28, fh = 22;
-    doc.setFillColor(190, 145, 95);
-    doc.rect(fx, by, fw, fh, 'F');
-    // veios madeira vista frontal
-    doc.setDrawColor(165, 118, 68);
-    doc.setLineWidth(0.3);
-    for (let vy = by + 4; vy < by + fh - 2; vy += 5) {
-      doc.line(fx + 2, vy, fx + fw - 2, vy + 1);
-    }
-    // borda
-    doc.setDrawColor(120, 70, 30);
-    doc.setLineWidth(0.5);
-    doc.rect(fx, by, fw, fh, 'S');
-    // Labels vista frontal
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6.5);
-    doc.setTextColor(60, 25, 5);
-    doc.text('A', fx + fw + 3, by + fh / 2 + 1);
-    doc.text('L', fx + fw / 2, by + fh + 5, { align: 'center' });
-    // seta altura frontal
-    doc.setDrawColor(60, 25, 5);
-    doc.setLineWidth(0.3);
-    doc.line(fx + fw + 2, by + 2, fx + fw + 2, by + fh - 2);
-    doc.line(fx + fw + 2, by + 2, fx + fw, by + 4);
-    doc.line(fx + fw + 2, by + 2, fx + fw + 4, by + 4);
-    doc.line(fx + fw + 2, by + fh - 2, fx + fw, by + fh - 4);
-    doc.line(fx + fw + 2, by + fh - 2, fx + fw + 4, by + fh - 4);
-    // seta largura frontal
-    doc.line(fx + 2, by + fh + 3, fx + fw - 2, by + fh + 3);
-    doc.line(fx + 2, by + fh + 3, fx + 4, by + fh + 1);
-    doc.line(fx + 2, by + fh + 3, fx + 4, by + fh + 5);
-    doc.line(fx + fw - 2, by + fh + 3, fx + fw - 4, by + fh + 1);
-    doc.line(fx + fw - 2, by + fh + 3, fx + fw - 4, by + fh + 5);
-
-    // Nota sem escala
-    doc.setFont('helvetica', 'italic');
-    doc.setFontSize(6);
-    doc.setTextColor(140, 100, 70);
-    doc.text('* Desenho sem escala — apenas ilustrativo', 105, by + fh + 12, { align: 'center' });
+    doc.setTextColor(74, 36, 16);
+    doc.text('Tolerância dimensional:', bx + 3, tolY + 6);
+    doc.setFont('helvetica', 'normal');
+    doc.text(' as dimensões podem apresentar variações.', bx + 37, tolY + 6);
   }
 
   // ── RODAPÉ ───────────────────────────────────────────
