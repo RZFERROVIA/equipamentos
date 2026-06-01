@@ -636,4 +636,160 @@ function renderizarHist(resultados, query) {
   }
   const ordenados = [...resultados].sort((a,b) => (b.ts||0)-(a.ts||0));
 
-  if (query)
+  if (query) {
+    const grupos = {};
+    ordenados.forEach(r => {
+      const k = r.pat.toUpperCase();
+      if (!grupos[k]) grupos[k]=[];
+      grupos[k].push(r);
+    });
+    let html = '';
+    Object.entries(grupos).forEach(([pat,itens]) => {
+      html += `<div class="hist-pat-title">Patrimônio <strong>${pat}</strong> — ${itens[0].eq||'—'} &nbsp;·&nbsp; ${itens.length} registro(s)</div>`;
+      itens.forEach(r => { html += cartaoHist(r, hist.indexOf(r)); });
+    });
+    cont.innerHTML = html;
+  } else {
+    cont.innerHTML = `<div style="font-size:11px;color:var(--text3);margin-bottom:10px">${ordenados.length} registro(s) no total</div>` +
+      ordenados.map(r => cartaoHist(r, hist.indexOf(r))).join('');
+  }
+}
+
+function cartaoHist(r, idx) {
+  const s        = LEG_SENTIDO[r.leg]||'';
+  const dirClass = s==='entrada'?'hist-dir-entrada':s==='saida'?'hist-dir-saida':'';
+  const dirIcon  = s==='entrada'?'←':s==='saida'?'→':'↕';
+  const dirLabel = s==='entrada'?'Entrada':s==='saida'?'Saída':'Substituição';
+  const obsHtml  = r.obs     ? `<div class="hist-item-obs">Obs: ${r.obs}</div>` : '';
+  const obsGHtml = r.obsGeral? `<div class="hist-item-obs" style="color:var(--text3)">📝 Obs geral: ${r.obsGeral}</div>` : '';
+  const substHtml= r.leg==='S'&&(r.saiu||r.entrou)?
+    `<div style="font-size:11px;color:var(--text2);margin-top:4px">→ Saiu: ${r.saiu||'—'} &nbsp;|&nbsp; ← Entrou: ${r.entrou||'—'}</div>`:'';
+  return `
+    <div class="hist-item">
+      <div class="hist-item-top">
+        <div>
+          <div class="hist-item-eq">${r.eq||'—'}</div>
+          <div class="hist-item-meta">
+            <span class="${dirClass}">${dirIcon} ${dirLabel}</span>
+            <span class="badge ${LEG_CLS[r.leg]||''}" style="padding:1px 6px;font-size:10px">${r.leg}</span>
+            <span>${LEG_MAP[r.leg]||r.leg}</span>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:12px;font-weight:700;color:var(--text)">${r.data||'—'}</div>
+          <div style="font-size:10px;color:var(--text3)">Folha ${r.folha||'—'}</div>
+        </div>
+      </div>
+      <div class="hist-item-meta" style="margin-top:4px">
+        <span>🏢 ${r.empresa||'—'}</span>
+        ${r.contrato?`<span>📄 ${r.contrato}</span>`:''}
+        ${r.cidade?`<span>📍 ${r.cidade}</span>`:''}
+        ${r.nf?`<span>🧾 NF: ${r.nf}</span>`:''}
+      </div>
+      ${substHtml}${obsHtml}${obsGHtml}
+      <div class="hist-item-actions">
+        <button class="hist-btn" onclick="abrirEdicao(${idx})">✏️ Editar</button>
+        <button class="hist-btn danger" onclick="apagarRegistro(${idx})">🗑 Apagar</button>
+      </div>
+    </div>
+  `;
+}
+
+function abrirEdicao(idx) {
+  const r = getHistorico()[idx];
+  if (!r) return;
+  editIdx = idx;
+  document.getElementById('edit-eq').value  = r.eq  || '';
+  document.getElementById('edit-pat').value = r.pat || '';
+  document.getElementById('edit-leg').value = r.leg || '';
+  document.getElementById('edit-obs').value = r.obs || '';
+  document.getElementById('modal-edit').classList.add('open');
+}
+
+function salvarEdicao() {
+  if (editIdx===null) return;
+  const hist = getHistorico();
+  hist[editIdx].eq  = document.getElementById('edit-eq').value;
+  hist[editIdx].pat = document.getElementById('edit-pat').value.trim();
+  hist[editIdx].leg = document.getElementById('edit-leg').value;
+  hist[editIdx].obs = document.getElementById('edit-obs').value.trim();
+  salvarHistoricoLS(hist);
+  fecharModal('modal-edit');
+  toast('Registro atualizado ✓');
+  mostrarTodos();
+}
+
+function apagarRegistro(idx) {
+  if (!confirm('Apagar este registro do histórico?')) return;
+  const hist = getHistorico();
+  hist.splice(idx, 1);
+  salvarHistoricoLS(hist);
+  toast('Registro apagado ✓');
+  mostrarTodos();
+}
+
+function confirmarLimpar() {
+  if (confirm('Limpar todos os itens da folha?')) {
+    document.getElementById('eq-rows').innerHTML = '';
+    rowCount = 0; atualizar();
+    toast('Folha limpa ✓');
+  }
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+document.querySelectorAll('.modal-bg').forEach(m => {
+  m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+});
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+function exportarExcel() {
+  const hist = getHistorico();
+  if (!hist.length) { toast('Nenhum registro para exportar ⚠'); return; }
+
+  const colunas = ['Folha','Data','Empresa','Contrato','Cidade','NF','Equipamento','Patrimônio','Legenda','Movimentação','Saiu da oficina','Entrou na oficina','Obs'];
+
+  const linhas = hist.map(r => ({
+    'Folha':            r.folha    || '—',
+    'Data':             r.data     || '—',
+    'Empresa':          r.empresa  || '—',
+    'Contrato':         r.contrato || '—',
+    'Cidade':           r.cidade   || '—',
+    'NF':               r.nf       || '',
+    'Equipamento':      r.eq       || '—',
+    'Patrimônio':       r.pat      || '—',
+    'Legenda':          r.leg      || '—',
+    'Movimentação':     LEG_MAP[r.leg] || r.leg || '—',
+    'Saiu da oficina':  r.saiu     || '',
+    'Entrou na oficina':r.entrou   || '',
+    'Obs':              r.obs      || ''
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(linhas, {header: colunas});
+
+  ws['!cols'] = [
+    {wch:8},{wch:12},{wch:20},{wch:18},{wch:18},{wch:10},
+    {wch:28},{wch:12},{wch:8},{wch:24},{wch:16},{wch:16},{wch:24}
+  ];
+
+  ws['!autofilter'] = {ref: `A1:M${linhas.length+1}`};
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Histórico');
+
+  const hoje = new Date().toISOString().split('T')[0].split('-').reverse().join('-');
+  XLSX.writeFile(wb, `equipamentos_${hoje}.xlsx`);
+  toast(`Excel gerado! ${linhas.length} registros ✓`);
+}
+</script>
+</body>
+</html>
